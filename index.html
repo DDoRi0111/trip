@@ -1,715 +1,702 @@
-import React, { useState, useRef } from 'react';
-import { 
-  Plane, MapPin, ShoppingBag, Calendar, Clock, 
-  ChevronRight, Hotel, Utensils, Camera, 
-  Wallet, Car, ExternalLink, CheckCircle, CreditCard
-} from 'lucide-react';
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>구마모토 & 벳푸 여행 일정</title>
+    <!-- Tailwind CSS (스타일링) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- React & ReactDOM (리액트 코어) -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <!-- Babel (JSX 변환) -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        /* 스크롤바 숨김 처리 */
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fadeIn { animation: fadeIn 0.3s ease-out forwards; }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans">
+    <div id="root"></div>
 
-// --- Components ---
+    <script type="text/babel">
+        const { useState, useRef } = React;
 
-// 1. 항공 타임라인 카드 컴포넌트 (요청하신 디자인)
-// App 컴포넌트 밖으로 이동하여 안정성 확보
-const FlightTimelineCard = ({ flightInfo, type }) => {
-  const isDept = type === 'departure';
-  // 날짜 포맷 (YYYY.MM.DD(요일))
-  const dateStr = flightInfo.date ? `2026.${flightInfo.date}` : '';
-  
-  return (
-    <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 mb-4 last:mb-0">
-      <div className="flex items-center justify-between">
-        {/* Left: Origin */}
-        <div className="text-center min-w-[80px]">
-          <div className="text-sm font-bold text-gray-800 mb-1">
-            {flightInfo.from.split('(')[0]} <span className="text-gray-500 font-normal">({flightInfo.from.split('(')[1]}</span>
-            <span className="text-xs font-normal text-gray-500 block mt-0.5">출발</span>
-          </div>
-          <div className="text-xs text-gray-400 mb-2">{dateStr}</div>
-          <div className="text-3xl font-bold text-gray-800 tracking-tight">
-            {flightInfo.time.split('-')[0].trim()}
-          </div>
-        </div>
+        // --- 아이콘 컴포넌트 (Lucide React 대체) ---
+        const IconBase = ({ children, className }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>{children}</svg>
+        );
+        
+        // Real Lucide icons paths
+        const Icons = {
+            Plane: ({ className }) => <IconBase className={className}><path d="M19 12h2l-8.5-9H9l4 9H5l-2.5-3H0l4 3-4 3h2.5L5 12h8l-4 9h3.5l8.5-9h-2z" /></IconBase>,
+            MapPin: ({ className }) => <IconBase className={className}><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></IconBase>,
+            ShoppingBag: ({ className }) => <IconBase className={className}><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></IconBase>,
+            Calendar: ({ className }) => <IconBase className={className}><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></IconBase>,
+            Clock: ({ className }) => <IconBase className={className}><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></IconBase>,
+            ChevronRight: ({ className }) => <IconBase className={className}><path d="m9 18 6-6-6-6"/></IconBase>,
+            Hotel: ({ className }) => <IconBase className={className}><path d="M10 22v-6.57"/><path d="M12 11h.01"/><path d="M12 7h.01"/><path d="M14 15.43V22"/><path d="M15 16a5 5 0 0 0-6 0"/><path d="M16 11h.01"/><path d="M16 7h.01"/><path d="M8 11h.01"/><path d="M8 7h.01"/><rect x="4" y="2" width="16" height="20" rx="2"/></IconBase>,
+            Utensils: ({ className }) => <IconBase className={className}><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></IconBase>,
+            Camera: ({ className }) => <IconBase className={className}><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></IconBase>,
+            Wallet: ({ className }) => <IconBase className={className}><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></IconBase>,
+            Car: ({ className }) => <IconBase className={className}><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></IconBase>,
+            ExternalLink: ({ className }) => <IconBase className={className}><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></IconBase>,
+            CheckCircle: ({ className }) => <IconBase className={className}><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></IconBase>,
+            CreditCard: ({ className }) => <IconBase className={className}><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></IconBase>
+        };
 
-        {/* Center: Duration & Airline */}
-        <div className="flex-1 px-4 flex flex-col items-center">
-          <div className="flex items-center gap-1 mb-2">
-            {/* 이스타항공 로고 이미지 URL 변경 */}
-            <img src="https://img.modetour.com/air/logo/ZE.png" alt="Eastar" className="h-4 object-contain" />
-            <span className="text-xs font-bold text-gray-600">이스타항공</span>
-          </div>
-          <div className="w-full flex items-center gap-2 relative">
-            <div className="h-[1px] bg-gray-300 flex-1"></div>
-            <div className="bg-gray-100 text-gray-500 text-[10px] px-2 py-0.5 rounded-full whitespace-nowrap z-10">
-              {flightInfo.duration} 소요
+        const { Plane, MapPin, ShoppingBag, Calendar, Clock, ChevronRight, Hotel, Utensils, Camera, Wallet, Car, ExternalLink, CheckCircle, CreditCard } = Icons;
+
+        // 1. 항공 타임라인 카드 컴포넌트
+        const FlightTimelineCard = ({ flightInfo, type }) => {
+          const isDept = type === 'departure';
+          const dateStr = flightInfo.date ? `2026.${flightInfo.date}` : '';
+          
+          return (
+            <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 mb-4 last:mb-0">
+              <div className="flex items-center justify-between">
+                <div className="text-center min-w-[80px]">
+                  <div className="text-sm font-bold text-gray-800 mb-1">
+                    {flightInfo.from.split('(')[0]} <span className="text-gray-500 font-normal">({flightInfo.from.split('(')[1]}</span>
+                    <span className="text-xs font-normal text-gray-500 block mt-0.5">출발</span>
+                  </div>
+                  <div className="text-xs text-gray-400 mb-2">{dateStr}</div>
+                  <div className="text-3xl font-bold text-gray-800 tracking-tight">
+                    {flightInfo.time.split('-')[0].trim()}
+                  </div>
+                </div>
+
+                <div className="flex-1 px-4 flex flex-col items-center">
+                  <div className="flex items-center gap-1 mb-2">
+                    <img src="https://img.modetour.com/air/logo/ZE.png" alt="Eastar" className="h-4 object-contain" />
+                    <span className="text-xs font-bold text-gray-600">이스타항공</span>
+                  </div>
+                  <div className="w-full flex items-center gap-2 relative">
+                    <div className="h-[1px] bg-gray-300 flex-1"></div>
+                    <div className="bg-gray-100 text-gray-500 text-[10px] px-2 py-0.5 rounded-full whitespace-nowrap z-10">
+                      {flightInfo.duration} 소요
+                    </div>
+                    <div className="h-[1px] bg-gray-300 flex-1"></div>
+                  </div>
+                   <div className="text-[10px] text-gray-400 mt-1">{flightInfo.code}</div>
+                </div>
+
+                <div className="text-center min-w-[80px]">
+                  <div className="text-sm font-bold text-gray-800 mb-1">
+                    {flightInfo.to.split('(')[0]} <span className="text-gray-500 font-normal">({flightInfo.to.split('(')[1]}</span>
+                     <span className="text-xs font-normal text-gray-500 block mt-0.5">도착</span>
+                  </div>
+                   <div className="text-xs text-gray-400 mb-2">{dateStr}</div>
+                  <div className="text-3xl font-bold text-gray-800 tracking-tight">
+                    {flightInfo.time.split('-')[1].trim()}
+                  </div>
+                </div>
+              </div>
             </div>
-            <div className="h-[1px] bg-gray-300 flex-1"></div>
-          </div>
-           <div className="text-[10px] text-gray-400 mt-1">{flightInfo.code}</div>
-        </div>
+          );
+        };
 
-        {/* Right: Destination */}
-        <div className="text-center min-w-[80px]">
-          <div className="text-sm font-bold text-gray-800 mb-1">
-            {flightInfo.to.split('(')[0]} <span className="text-gray-500 font-normal">({flightInfo.to.split('(')[1]}</span>
-             <span className="text-xs font-normal text-gray-500 block mt-0.5">도착</span>
-          </div>
-           <div className="text-xs text-gray-400 mb-2">{dateStr}</div>
-          <div className="text-3xl font-bold text-gray-800 tracking-tight">
-            {flightInfo.time.split('-')[1].trim()}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
+        const App = () => {
+          const [activeTab, setActiveTab] = useState('itinerary'); 
+          const dayRefs = useRef([]);
 
-const App = () => {
-  const [activeTab, setActiveTab] = useState('itinerary'); 
-  const dayRefs = useRef([]);
+          const getGoogleMapsLink = (query) => {
+            return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
+          };
 
-  // 구글 맵 검색 링크 생성 함수
-  const getGoogleMapsLink = (query) => {
-    return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
-  };
-
-  const scrollToDay = (index) => {
-    const element = dayRefs.current[index];
-    if (element) {
-      const headerOffset = 180;
-      const elementPosition = element.getBoundingClientRect().top;
-      const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-  
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: "smooth"
-      });
-    }
-  };
-
-  const travelData = {
-    title: "구마모토 & 벳푸 4박 5일",
-    subtitle: "벚꽃 시즌 힐링 가족 여행",
-    period: "2026.03.27 (금) ~ 03.31 (화)",
-    flights: {
-      departure: {
-        code: "ZE967",
-        date: "03.27 (금)",
-        from: "부산 (PUS)",
-        to: "구마모토 (KMJ)",
-        time: "11:55 - 13:25", 
-        duration: "01시간 30분"
-      },
-      return: {
-        code: "ZE968",
-        date: "03.31 (화)",
-        from: "구마모토 (KMJ)",
-        to: "부산 (PUS)",
-        time: "14:50 - 15:55",
-        duration: "01시간 05분"
-      }
-    },
-    // 상단 요약 섹션용 데이터 수정
-    summary: {
-      meal: "현지 맛집(스시, 라멘, 텐동) 탐방 + 호텔 조식 2회 포함",
-      tour: [ 
-        "구마모토 성 & 벚꽃 놀이",
-        "아소산 쿠사센리 대초원",
-        "시라카와 수원 (일본 명수 100선)",
-        "하모니랜드 테마파크"
-        // 벳푸 지옥 순례 삭제됨
-      ],
-      hotels: [
-        {
-          badge: "1~2일차",
-          count: "예정 숙소 1개",
-          name: "REF 구마모토 by 베셀 호텔",
-          desc: "사쿠라마치 터미널 직결, 대욕장 보유 (2인 1실 트윈)",
-          query: "REF Kumamoto by Vessel Hotels"
-        },
-        {
-          badge: "3~4일차",
-          count: "예정 숙소 1개",
-          name: "아마넥 벳푸 유라리",
-          desc: "벳푸역 인근, 루프탑 인피니티 풀 (2인 1실 트윈)",
-          tags: ["조식 포함"], // 조식 포함 태그 추가
-          query: "Amanek Beppu Yula-re"
-        }
-      ]
-    },
-    // 사전 경비 데이터 추가
-    prepaidCosts: [
-      { item: "항공권", cost: "xx원" },
-      { item: "REF 숙소", cost: "xx원" },
-      { item: "아마넥 숙소", cost: "xx원" },
-      { item: "렌터카 예약", cost: "xx엔 (현지결제)" },
-      { item: "하모니랜드 티켓", cost: "xx원" }
-    ],
-    itinerary: [
-      {
-        day: 1,
-        date: "03.27 (금)",
-        location: "구마모토 도착",
-        events: [
-          { 
-            type: "flight_card", 
-            flightInfo: {
-              code: "ZE967",
-              date: "03.27 (금)",
-              from: "부산 (PUS)",
-              to: "구마모토 (KMJ)",
-              time: "11:55 - 13:25", 
-              duration: "01시간 30분"
+          const scrollToDay = (index) => {
+            const element = dayRefs.current[index];
+            if (element) {
+              const headerOffset = 180;
+              const elementPosition = element.getBoundingClientRect().top;
+              const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+          
+              window.scrollTo({
+                top: offsetPosition,
+                behavior: "smooth"
+              });
             }
-          },
-          { time: "14:00", title: "렌터카 수령", desc: "셔틀 이동 후 인수 (코롤라 등급)", type: "move" },
-          { 
-            time: "14:30", title: "점심: 조이풀 (Joyfull)", type: "food",
-            desc: "규슈의 대표적인 패밀리 레스토랑. 함박스테이크와 키즈 메뉴가 다양합니다.",
-            searchQuery: "Kumamoto Joyfull Restaurant"
-          },
-          { 
-            time: "15:50", title: "쇼핑: 메가 돈키호테", type: "shopping",
-            desc: "물, 간식, 휴족시간 구매 (☎ 096-213-6011)", 
-            searchQuery: "Mega Don Quijote Kikuyo"
-          },
-          { 
-            time: "17:40", title: "체크인: REF 구마모토", type: "hotel",
-            // "터미널 바로 위" 삭제
-            desc: "대욕장과 웰컴 드링크가 있는 최신식 호텔입니다.",
-            hasCard: false 
-          },
-          { 
-            time: "18:30", title: "저녁: 우시부카마루", type: "food",
-            // "지하 1층" -> "3층" 수정
-            desc: "구마모토 아마쿠사 직송 생선으로 만드는 신선한 회전초밥 맛집 (3층)",
-            searchQuery: "Ushibukamaru Kumamoto Sakuramachi"
-          }
-        ]
-      },
-      {
-        day: 2,
-        date: "03.28 (토)",
-        location: "구마모토 시내",
-        events: [
-          { 
-            time: "07:30", title: "아침: 스키야", type: "food",
-            desc: "호텔 도보 2분 (규동, 어린이 세트)", 
-            searchQuery: "Sukiya Kumamoto"
-          },
-          { 
-            time: "09:00", title: "구마모토 성 & 벚꽃", type: "tour",
-            desc: "일본 3대 명성 중 하나. 3월 말 벚꽃이 만개하여 죠사이엔에서 미유키자카로 이어지는 길이 아름답습니다.",
-            isGallery: true, 
-            images: [
-              "https://image.hanatour.com/usr/cms/resize/400_0/2023/12/28/10000/c91926e2-7d2b-4a27-83c7-3663d40486de.jpg",
-              "https://image.hanatour.com/usr/cms/resize/400_0/2017/09/20/10000/d3d21d6d-814d-48cc-8273-dc2f47c1262d.jpg",
-              "https://www.japan-guide.com/g18/8200_01.jpg",
+          };
+
+          const travelData = {
+            title: "구마모토 & 벳푸 4박 5일",
+            subtitle: "벚꽃 시즌 힐링 가족 여행",
+            period: "2026.03.27 (금) ~ 03.31 (화)",
+            flights: {
+              departure: {
+                code: "ZE967",
+                date: "03.27 (금)",
+                from: "부산 (PUS)",
+                to: "구마모토 (KMJ)",
+                time: "11:55 - 13:25", 
+                duration: "01시간 30분"
+              },
+              return: {
+                code: "ZE968",
+                date: "03.31 (화)",
+                from: "구마모토 (KMJ)",
+                to: "부산 (PUS)",
+                time: "14:50 - 15:55",
+                duration: "01시간 05분"
+              }
+            },
+            summary: {
+              meal: "현지 맛집(스시, 라멘, 텐동) 탐방 + 호텔 조식 2회 포함",
+              tour: [ 
+                "구마모토 성 & 벚꽃 놀이",
+                "아소산 쿠사센리 대초원",
+                "시라카와 수원 (일본 명수 100선)",
+                "하모니랜드 테마파크"
+              ],
+              hotels: [
+                {
+                  badge: "1~2일차",
+                  count: "예정 숙소 1개",
+                  name: "REF 구마모토 by 베셀 호텔",
+                  desc: "사쿠라마치 터미널 직결, 대욕장 보유 (2인 1실 트윈)",
+                  query: "REF Kumamoto by Vessel Hotels"
+                },
+                {
+                  badge: "3~4일차",
+                  count: "예정 숙소 1개",
+                  name: "아마넥 벳푸 유라리",
+                  desc: "벳푸역 인근, 루프탑 인피니티 풀 (2인 1실 트윈)",
+                  tags: ["조식 포함"],
+                  query: "Amanek Beppu Yula-re"
+                }
+              ]
+            },
+            prepaidCosts: [
+              { item: "항공권", cost: "xx원" },
+              { item: "REF 숙소", cost: "xx원" },
+              { item: "아마넥 숙소", cost: "xx원" },
+              { item: "렌터카 예약", cost: "xx엔 (현지결제)" },
+              { item: "하모니랜드 티켓", cost: "xx원" }
             ],
-            searchQuery: "Kumamoto Castle"
-          },
-          { 
-            time: "12:00", title: "점심: 아지센 라멘", type: "food",
-            desc: "구마모토 돈코츠 라멘의 원조 (☎ 096-384-4444)", 
-            searchQuery: "Ajisen Ramen Main Store Kumamoto"
-          },
-          { 
-            time: "13:30", title: "구마모토 시 동식물원", type: "tour",
-            desc: "원피스 쵸파 동상이 있는 곳. 동물원과 식물원, 놀이기구를 한 번에 즐길 수 있습니다.", 
-            isGallery: true,
-            images: [
-              "https://kumamoto-guide.jp/files/06fea954-8116-47f2-ba5e-2696dfafb3ca_xl.png?1601494317",
-              "https://lh3.googleusercontent.com/p/AF1QipN3dD2X2p3Xj4b5t0e4hX9k2l3o0p7r8s9t4u1v=s1360-w1360-h1020",
+            itinerary: [
+              {
+                day: 1,
+                date: "03.27 (금)",
+                location: "구마모토 도착",
+                events: [
+                  { 
+                    type: "flight_card", 
+                    flightInfo: {
+                      code: "ZE967",
+                      date: "03.27 (금)",
+                      from: "부산 (PUS)",
+                      to: "구마모토 (KMJ)",
+                      time: "11:55 - 13:25", 
+                      duration: "01시간 30분"
+                    }
+                  },
+                  { time: "14:00", title: "렌터카 수령", desc: "셔틀 이동 후 인수 (코롤라 등급)", type: "move" },
+                  { 
+                    time: "14:30", title: "점심: 조이풀 (Joyfull)", type: "food",
+                    desc: "규슈의 대표적인 패밀리 레스토랑. 함박스테이크와 키즈 메뉴가 다양합니다.",
+                    searchQuery: "Kumamoto Joyfull Restaurant"
+                  },
+                  { 
+                    time: "15:50", title: "쇼핑: 메가 돈키호테", type: "shopping",
+                    desc: "물, 간식, 휴족시간 구매 (☎ 096-213-6011)", 
+                    searchQuery: "Mega Don Quijote Kikuyo"
+                  },
+                  { 
+                    time: "17:40", title: "체크인: REF 구마모토", type: "hotel",
+                    desc: "대욕장과 웰컴 드링크가 있는 최신식 호텔입니다.",
+                    hasCard: false 
+                  },
+                  { 
+                    time: "18:30", title: "저녁: 우시부카마루", type: "food",
+                    desc: "구마모토 아마쿠사 직송 생선으로 만드는 신선한 회전초밥 맛집 (3층)",
+                    searchQuery: "Ushibukamaru Kumamoto Sakuramachi"
+                  }
+                ]
+              },
+              {
+                day: 2,
+                date: "03.28 (토)",
+                location: "구마모토 시내",
+                events: [
+                  { 
+                    time: "07:30", title: "아침: 스키야", type: "food",
+                    desc: "호텔 도보 2분 (규동, 어린이 세트)", 
+                    searchQuery: "Sukiya Kumamoto"
+                  },
+                  { 
+                    time: "09:00", title: "구마모토 성 & 벚꽃", type: "tour",
+                    desc: "일본 3대 명성 중 하나. 3월 말 벚꽃이 만개하여 죠사이엔에서 미유키자카로 이어지는 길이 아름답습니다.",
+                    isGallery: true, 
+                    images: [
+                      "https://image.hanatour.com/usr/cms/resize/400_0/2023/12/28/10000/c91926e2-7d2b-4a27-83c7-3663d40486de.jpg",
+                      "https://image.hanatour.com/usr/cms/resize/400_0/2017/09/20/10000/d3d21d6d-814d-48cc-8273-dc2f47c1262d.jpg",
+                      "https://www.japan-guide.com/g18/8200_01.jpg",
+                    ],
+                    searchQuery: "Kumamoto Castle"
+                  },
+                  { 
+                    time: "12:00", title: "점심: 아지센 라멘", type: "food",
+                    desc: "구마모토 돈코츠 라멘의 원조 (☎ 096-384-4444)", 
+                    searchQuery: "Ajisen Ramen Main Store Kumamoto"
+                  },
+                  { 
+                    time: "13:30", title: "구마모토 시 동식물원", type: "tour",
+                    desc: "원피스 쵸파 동상이 있는 곳. 동물원과 식물원, 놀이기구를 한 번에 즐길 수 있습니다.", 
+                    isGallery: true,
+                    images: [
+                      "https://kumamoto-guide.jp/files/06fea954-8116-47f2-ba5e-2696dfafb3ca_xl.png?1601494317",
+                      "https://lh3.googleusercontent.com/p/AF1QipN3dD2X2p3Xj4b5t0e4hX9k2l3o0p7r8s9t4u1v=s1360-w1360-h1020",
+                    ],
+                    searchQuery: "Kumamoto City Zoological and Botanical Gardens"
+                  },
+                  { 
+                    time: "16:30", title: "쇼핑: 이온몰 구마모토", type: "shopping",
+                    desc: "토이저러스, 유니클로 (무료 주차)", 
+                    searchQuery: "Aeon Mall Kumamoto"
+                  },
+                  { 
+                    time: "18:00", title: "저녁: 이온몰 식당가", type: "food",
+                    desc: "카츠쿠라 돈카츠 또는 고코쿠", 
+                    searchQuery: "Katsukura Kumamoto"
+                  }
+                ]
+              },
+              {
+                day: 3,
+                date: "03.29 (일)",
+                location: "아소 → 벳푸",
+                events: [
+                  { time: "09:00", title: "체크아웃 및 출발", desc: "구마모토 시내 출발 (국도 57번)", type: "move" },
+                  { 
+                    time: "09:30", title: "아침: 도시락 포장", type: "food",
+                    desc: "Hotto Motto 또는 모스버거 포장", 
+                    searchQuery: "Hotto Motto Kumamoto"
+                  },
+                  { 
+                    time: "10:30", title: "아소산 쿠사센리", type: "tour",
+                    desc: "거대한 분화구 아래 펼쳐진 드넓은 초원. 말들이 뛰어노는 이국적인 풍경을 감상하며 도시락을 먹습니다.",
+                    isGallery: true,
+                    images: [
+                      "https://image.hanatour.com/usr/cms/resize/400_0/2017/08/25/10000/a7afa287-0721-4e02-87df-a9b7c2df9df0.jpg",
+                      "https://www.japan-guide.com/g18/4552_01.jpg",
+                      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT6-J8f0g6j8h5k4l2m0n2o4p6r8t0v2x4y6z&s"
+                    ],
+                    searchQuery: "Kusasenri Aso"
+                  },
+                  { 
+                    time: "13:30", title: "시라카와 수원", type: "tour",
+                    desc: "일본 명수 100선. 투명한 물을 직접 마셔볼 수 있습니다.", 
+                    isGallery: true, 
+                    images: [
+                      "https://kumamoto.guide/files/dad82950-5768-40a7-b4ad-2b4a4ed4691d_l.jpg?1571185599"
+                    ],
+                    searchQuery: "Shirakawa Source"
+                  },
+                  { 
+                    time: "17:00", title: "체크인: 아마넥 벳푸 유라리", type: "hotel",
+                    desc: "벳푸역 인근 신상 호텔. 옥상 인피니티 풀에서 온천 수증기가 피어오르는 시내 전경을 볼 수 있습니다.",
+                    hasCard: false 
+                  },
+                  { 
+                    time: "19:00", title: "저녁: 토요츠네 본점", type: "food",
+                    desc: "특제 소스가 일품인 벳푸 최고의 텐동 맛집", 
+                    searchQuery: "Toyotsune Beppu Station"
+                  }
+                ]
+              },
+              {
+                day: 4,
+                date: "03.30 (월)",
+                location: "벳푸 근교",
+                events: [
+                  { time: "08:30", title: "호텔 조식", desc: "든든하게 식사 후 출발", type: "food" },
+                  { 
+                    time: "10:15", title: "하모니랜드", type: "tour",
+                    desc: "헬로키티와 산리오 캐릭터들을 만날 수 있는 테마파크. 퍼레이드 관람 필수!",
+                    isGallery: true,
+                    images: [
+                       "https://hijinavi.com/files/Spot/0/Spot_56_image.jpg",
+                       "https://www.harmonyland.jp/images/top/main_visual_sp.jpg",
+                       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR_x1y3z5v7_w9u0t2s4r6p8q0o2n4m6l8k0j&s"
+                    ],
+                    searchQuery: "Sanrio Character Park Harmonyland"
+                  },
+                  { 
+                    time: "15:30", title: "[선택] 우미타마고 수족관", type: "tour",
+                    desc: "바다와 맞닿은 개방형 수족관 (하모니랜드 티켓 지참 시 할인)", 
+                    searchQuery: "Umitamago Aquarium"
+                  },
+                  { 
+                    time: "18:00", title: "저녁: 유메타운/이자카야", type: "food",
+                    desc: "쇼핑몰 식당가 또는 시내 식사", 
+                    searchQuery: "Youme Town Beppu"
+                  },
+                  { time: "20:00", title: "호텔 휴식", desc: "마지막 온천욕 및 짐 정리", type: "hotel" }
+                ]
+              },
+              {
+                day: 5,
+                date: "03.31 (화)",
+                location: "벳푸 → 귀국",
+                events: [
+                  { time: "09:00", title: "벳푸 출발 (시간 엄수)", desc: "공항까지 국도 약 3시간 소요", type: "move" },
+                  { time: "12:20", title: "주유 및 렌터카 반납", desc: "공항 근처 주유소 만땅 주유", type: "move" },
+                  { time: "13:00", title: "공항 도착/수속", desc: "이스타항공 카운터 체크인", type: "flight" },
+                  { 
+                    time: "13:30", title: "점심: 공항 식당가", type: "food",
+                    desc: "출국 전 마지막 식사", 
+                    searchQuery: "Kumamoto Airport Restaurant"
+                  },
+                  // 5일차 마지막에 항공 카드 배치
+                  { 
+                    type: "flight_card", 
+                    flightInfo: {
+                      code: "ZE968",
+                      date: "03.31 (화)",
+                      from: "구마모토 (KMJ)",
+                      to: "부산 (PUS)",
+                      time: "14:50 - 15:55",
+                      duration: "01시간 05분"
+                    }
+                  }
+                ]
+              }
             ],
-            searchQuery: "Kumamoto City Zoological and Botanical Gardens"
-          },
-          { 
-            time: "16:30", title: "쇼핑: 이온몰 구마모토", type: "shopping",
-            desc: "토이저러스, 유니클로 (무료 주차)", 
-            searchQuery: "Aeon Mall Kumamoto"
-          },
-          { 
-            time: "18:00", title: "저녁: 이온몰 식당가", type: "food",
-            desc: "카츠쿠라 돈카츠 또는 고코쿠", 
-            searchQuery: "Katsukura Kumamoto"
-          }
-        ]
-      },
-      {
-        day: 3,
-        date: "03.29 (일)",
-        location: "아소 → 벳푸",
-        events: [
-          { time: "09:00", title: "체크아웃 및 출발", desc: "구마모토 시내 출발 (국도 57번)", type: "move" },
-          { 
-            time: "09:30", title: "아침: 도시락 포장", type: "food",
-            desc: "Hotto Motto 또는 모스버거 포장", 
-            searchQuery: "Hotto Motto Kumamoto"
-          },
-          { 
-            time: "10:30", title: "아소산 쿠사센리", type: "tour",
-            desc: "거대한 분화구 아래 펼쳐진 드넓은 초원. 말들이 뛰어노는 이국적인 풍경을 감상하며 도시락을 먹습니다.",
-            isGallery: true,
-            images: [
-              "https://image.hanatour.com/usr/cms/resize/400_0/2017/08/25/10000/a7afa287-0721-4e02-87df-a9b7c2df9df0.jpg",
-              "https://www.japan-guide.com/g18/4552_01.jpg",
-              "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT6-J8f0g6j8h5k4l2m0n2o4p6r8t0v2x4y6z&s"
-            ],
-            searchQuery: "Kusasenri Aso"
-          },
-          { 
-            time: "13:30", title: "시라카와 수원", type: "tour",
-            desc: "일본 명수 100선. 투명한 물을 직접 마셔볼 수 있습니다.", 
-            isGallery: true, 
-            images: [
-              "https://kumamoto.guide/files/dad82950-5768-40a7-b4ad-2b4a4ed4691d_l.jpg?1571185599"
-            ],
-            searchQuery: "Shirakawa Source"
-          },
-          { 
-            time: "17:00", title: "체크인: 아마넥 벳푸 유라리", type: "hotel",
-            desc: "벳푸역 인근 신상 호텔. 옥상 인피니티 풀에서 온천 수증기가 피어오르는 시내 전경을 볼 수 있습니다.",
-            hasCard: false 
-          },
-          { 
-            time: "19:00", title: "저녁: 토요츠네 본점", type: "food",
-            desc: "특제 소스가 일품인 벳푸 최고의 텐동 맛집", 
-            searchQuery: "Toyotsune Beppu Station"
-          }
-        ]
-      },
-      {
-        day: 4,
-        date: "03.30 (월)",
-        location: "벳푸 근교",
-        events: [
-          { time: "08:30", title: "호텔 조식", desc: "든든하게 식사 후 출발", type: "food" },
-          { 
-            time: "10:15", title: "하모니랜드", type: "tour",
-            desc: "헬로키티와 산리오 캐릭터들을 만날 수 있는 테마파크. 퍼레이드 관람 필수!",
-            isGallery: true,
-            images: [
-               "https://hijinavi.com/files/Spot/0/Spot_56_image.jpg",
-               "https://www.harmonyland.jp/images/top/main_visual_sp.jpg",
-               "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR_x1y3z5v7_w9u0t2s4r6p8q0o2n4m6l8k0j&s"
-            ],
-            searchQuery: "Sanrio Character Park Harmonyland"
-          },
-          { 
-            time: "15:30", title: "[선택] 우미타마고 수족관", type: "tour",
-            desc: "바다와 맞닿은 개방형 수족관 (하모니랜드 티켓 지참 시 할인)", 
-            searchQuery: "Umitamago Aquarium"
-          },
-          { 
-            time: "18:00", title: "저녁: 유메타운/이자카야", type: "food",
-            desc: "쇼핑몰 식당가 또는 시내 식사", 
-            searchQuery: "Youme Town Beppu"
-          },
-          { time: "20:00", title: "호텔 휴식", desc: "마지막 온천욕 및 짐 정리", type: "hotel" }
-        ]
-      },
-      {
-        day: 5,
-        date: "03.31 (화)",
-        location: "벳푸 → 귀국",
-        events: [
-          { time: "09:00", title: "벳푸 출발 (시간 엄수)", desc: "공항까지 국도 약 3시간 소요", type: "move" },
-          { time: "12:20", title: "주유 및 렌터카 반납", desc: "공항 근처 주유소 만땅 주유", type: "move" },
-          { time: "13:00", title: "공항 도착/수속", desc: "이스타항공 카운터 체크인", type: "flight" },
-          { 
-            time: "13:30", title: "점심: 공항 식당가", type: "food",
-            desc: "출국 전 마지막 식사", 
-            searchQuery: "Kumamoto Airport Restaurant"
-          },
-          // 5일차 마지막에 항공 카드 배치
-          { 
-            type: "flight_card", 
-            flightInfo: {
-              code: "ZE968",
-              date: "03.31 (화)",
-              from: "구마모토 (KMJ)",
-              to: "부산 (PUS)",
-              time: "14:50 - 15:55",
-              duration: "01시간 05분"
-            }
-          }
-        ]
-      }
-    ],
-    shopping: [
-      {
-        name: "메가 돈키호테 키쿠요점",
-        category: "종합 잡화",
-        desc: "구마모토 공항 인근, 넓고 쾌적한 쇼핑 환경",
-        mustBuy: ["휴족시간", "과자", "의약품"],
-        icon: <ShoppingBag className="w-6 h-6 text-pink-500" />
-      },
-      // 사쿠라마치 구마모토 삭제됨
-      {
-        name: "이온몰 구마모토",
-        category: "대형 마트",
-        desc: "무료 주차 가능, 토이저러스와 유니클로 입점",
-        mustBuy: ["장난감", "유니클로", "마트 장보기"],
-        icon: <ShoppingBag className="w-6 h-6 text-blue-500" />
-      }
-    ]
-  };
+            shopping: [
+              {
+                name: "메가 돈키호테 키쿠요점",
+                category: "종합 잡화",
+                desc: "구마모토 공항 인근, 넓고 쾌적한 쇼핑 환경",
+                mustBuy: ["휴족시간", "과자", "의약품"],
+                icon: <ShoppingBag className="w-6 h-6 text-pink-500" />
+              },
+              {
+                name: "이온몰 구마모토",
+                category: "대형 마트",
+                desc: "무료 주차 가능, 토이저러스와 유니클로 입점",
+                mustBuy: ["장난감", "유니클로", "마트 장보기"],
+                icon: <ShoppingBag className="w-6 h-6 text-blue-500" />
+              }
+            ]
+          };
 
-  return (
-    <div className="bg-white min-h-screen font-sans text-gray-800 pb-12 max-w-3xl mx-auto shadow-2xl relative">
-      <style>{`
-        .hide-scrollbar::-webkit-scrollbar {
-          display: none;
-        }
-        .hide-scrollbar {
-          -ms-overflow-style: none;
-          scrollbar-width: none;
-        }
-      `}</style>
-
-      {/* Header Image Area */}
-      <div className="relative h-56 bg-slate-800">
-        <img 
-          src="https://img.modetour.com/eagle/photoimg/85344/bfile/638912949444539345.png" 
-          alt="Header" 
-          className="w-full h-full object-cover opacity-80"
-        />
-        <div className="absolute bottom-0 left-0 p-6 text-white w-full bg-gradient-to-t from-black/80 to-transparent">
-          <div className="inline-block px-3 py-1 bg-pink-500 text-xs font-bold rounded-full mb-2 shadow-md">FAMILY TRIP</div>
-          <h1 className="text-2xl font-bold leading-tight">{travelData.title}</h1>
-          <p className="text-sm opacity-90 mt-1">{travelData.subtitle}</p>
-        </div>
-      </div>
-
-      {/* Main Tabs */}
-      <div className="flex border-b border-gray-200">
-        <button 
-          onClick={() => setActiveTab('itinerary')}
-          className={`flex-1 py-4 text-center font-bold text-sm ${activeTab === 'itinerary' ? 'text-pink-600 border-b-2 border-pink-600' : 'text-gray-400'}`}
-        >
-          통합 일정표
-        </button>
-        <button 
-          onClick={() => setActiveTab('shopping')}
-          className={`flex-1 py-4 text-center font-bold text-sm ${activeTab === 'shopping' ? 'text-pink-600 border-b-2 border-pink-600' : 'text-gray-400'}`}
-        >
-          쇼핑 & 비용
-        </button>
-      </div>
-
-      {activeTab === 'itinerary' && (
-        <>
-          {/* Quick Day Navigation (Sticky) */}
-          <div className="sticky top-0 z-40 bg-white/95 backdrop-blur-sm shadow-sm border-b border-gray-100 flex overflow-x-auto hide-scrollbar px-2 py-2 gap-2">
-            {travelData.itinerary.map((day, idx) => (
-              <button 
-                key={idx}
-                onClick={() => scrollToDay(idx)}
-                className="flex-shrink-0 px-4 py-2 rounded-full bg-gray-50 border border-gray-200 text-xs font-bold text-gray-600 hover:bg-pink-50 hover:text-pink-600 hover:border-pink-200 transition-all whitespace-nowrap"
-              >
-                {day.day}일차
-              </button>
-            ))}
-          </div>
-
-          <div className="p-5 space-y-8">
-            {/* 1. TOP FLIGHT SECTION (UPDATED DESIGN) */}
-            <section>
-              <h2 className="text-lg font-bold mb-4 text-gray-800 flex items-center">
-                <Plane className="w-5 h-5 mr-2 text-pink-600" /> 항공 일정 (요약)
-              </h2>
-              {/* Using FlightTimelineCard instead of old design */}
-              <FlightTimelineCard flightInfo={travelData.flights.departure} type="departure" />
-              <FlightTimelineCard flightInfo={travelData.flights.return} type="arrival" />
-            </section>
-
-            <hr className="border-gray-100" />
-
-            {/* 2. SUMMARY SECTION (REFACTORED: 교통 삭제, 관광 추가, 제목 변경) */}
-            <section className="bg-white p-2">
-              <h2 className="text-lg font-bold mb-6 text-gray-800">여행 요약</h2>
-              
-              <div className="space-y-6">
-                {/* Traffic Removed */}
-
-                {/* Meal */}
-                <div className="flex gap-4">
-                   <div className="flex flex-col items-center w-6">
-                      <Utensils className="w-5 h-5 text-gray-400" />
-                      <div className="w-[2px] h-full bg-gray-200 mt-2"></div>
-                   </div>
-                   <div className="flex-1 pb-4">
-                      <h3 className="text-base font-bold text-gray-800 mb-1">식사</h3>
-                      <p className="text-sm text-gray-600 leading-relaxed">{travelData.summary.meal}</p>
-                   </div>
+          return (
+            <div className="bg-white min-h-screen font-sans text-gray-800 pb-12 max-w-3xl mx-auto shadow-2xl relative">
+              {/* Header Image Area */}
+              <div className="relative h-56 bg-slate-800">
+                <img 
+                  src="https://img.modetour.com/eagle/photoimg/85344/bfile/638912949444539345.png" 
+                  alt="Header" 
+                  className="w-full h-full object-cover opacity-80"
+                />
+                <div className="absolute bottom-0 left-0 p-6 text-white w-full bg-gradient-to-t from-black/80 to-transparent">
+                  <div className="inline-block px-3 py-1 bg-pink-500 text-xs font-bold rounded-full mb-2 shadow-md">FAMILY TRIP</div>
+                  <h1 className="text-2xl font-bold leading-tight">{travelData.title}</h1>
+                  <p className="text-sm opacity-90 mt-1">{travelData.subtitle}</p>
                 </div>
+              </div>
 
-                {/* Tour (New Category) */}
-                <div className="flex gap-4">
-                   <div className="flex flex-col items-center w-6">
-                      <Camera className="w-5 h-5 text-gray-400" />
-                      <div className="w-[2px] h-full bg-gray-200 mt-2"></div>
-                   </div>
-                   <div className="flex-1 pb-4">
-                      <h3 className="text-base font-bold text-gray-800 mb-1">관광</h3>
-                      <ul className="text-sm text-gray-600 leading-relaxed list-disc list-inside space-y-1">
-                        {travelData.summary.tour.map((spot, idx) => (
-                          <li key={idx}>{spot}</li>
-                        ))}
-                      </ul>
-                   </div>
-                </div>
+              {/* Main Tabs */}
+              <div className="flex border-b border-gray-200">
+                <button 
+                  onClick={() => setActiveTab('itinerary')}
+                  className={`flex-1 py-4 text-center font-bold text-sm ${activeTab === 'itinerary' ? 'text-pink-600 border-b-2 border-pink-600' : 'text-gray-400'}`}
+                >
+                  통합 일정표
+                </button>
+                <button 
+                  onClick={() => setActiveTab('shopping')}
+                  className={`flex-1 py-4 text-center font-bold text-sm ${activeTab === 'shopping' ? 'text-pink-600 border-b-2 border-pink-600' : 'text-gray-400'}`}
+                >
+                  쇼핑 & 비용
+                </button>
+              </div>
 
-                {/* Hotels (Connected Line Style) */}
-                <div className="flex gap-4">
-                   <div className="flex flex-col items-center w-6">
-                      <Hotel className="w-5 h-5 text-gray-400" />
-                   </div>
-                   <div className="flex-1">
-                      <h3 className="text-base font-bold text-gray-800 mb-4">숙소</h3>
-                      <div className="space-y-6 pb-4">
-                        {travelData.summary.hotels.map((hotel, idx) => (
-                           <div key={idx} className="relative">
-                              {/* Connector Circle */}
-                              <div className="absolute -left-[30px] top-2 w-2 h-2 rounded-full bg-gray-300"></div>
-                              
-                              <div className="flex items-center gap-2 mb-2">
-                                <span className="font-bold text-sm text-gray-800">{hotel.badge}</span>
-                                <span className="inline-block px-2 py-0.5 bg-orange-100 text-orange-600 text-[10px] font-bold rounded">
-                                  {hotel.count}
-                                </span>
-                              </div>
-                              <div className="border border-gray-200 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow relative overflow-hidden">
-                                 {/* Highlight for Breakfast Included */}
-                                 {hotel.tags && hotel.tags.includes("조식 포함") && (
-                                   <div className="absolute top-0 right-0 bg-blue-500 text-white text-[10px] font-bold px-3 py-1 rounded-bl-lg">
-                                     조식 포함
+              {activeTab === 'itinerary' && (
+                <>
+                  {/* Quick Day Navigation (Sticky) */}
+                  <div className="sticky top-0 z-40 bg-white/95 backdrop-blur-sm shadow-sm border-b border-gray-100 flex overflow-x-auto hide-scrollbar px-2 py-2 gap-2">
+                    {travelData.itinerary.map((day, idx) => (
+                      <button 
+                        key={idx}
+                        onClick={() => scrollToDay(idx)}
+                        className="flex-shrink-0 px-4 py-2 rounded-full bg-gray-50 border border-gray-200 text-xs font-bold text-gray-600 hover:bg-pink-50 hover:text-pink-600 hover:border-pink-200 transition-all whitespace-nowrap"
+                      >
+                        {day.day}일차
+                      </button>
+                    ))}
+                  </div>
+
+                  <div className="p-5 space-y-8">
+                    {/* 1. TOP FLIGHT SECTION (UPDATED DESIGN) */}
+                    <section>
+                      <h2 className="text-lg font-bold mb-4 text-gray-800 flex items-center">
+                        <Plane className="w-5 h-5 mr-2 text-pink-600" /> 항공 일정 (요약)
+                      </h2>
+                      <FlightTimelineCard flightInfo={travelData.flights.departure} type="departure" />
+                      <FlightTimelineCard flightInfo={travelData.flights.return} type="arrival" />
+                    </section>
+
+                    <hr className="border-gray-100" />
+
+                    {/* 2. SUMMARY SECTION */}
+                    <section className="bg-white p-2">
+                      <h2 className="text-lg font-bold mb-6 text-gray-800">여행 요약</h2>
+                      
+                      <div className="space-y-6">
+                        {/* Meal */}
+                        <div className="flex gap-4">
+                           <div className="flex flex-col items-center w-6">
+                              <Utensils className="w-5 h-5 text-gray-400" />
+                              <div className="w-[2px] h-full bg-gray-200 mt-2"></div>
+                           </div>
+                           <div className="flex-1 pb-4">
+                              <h3 className="text-base font-bold text-gray-800 mb-1">식사</h3>
+                              <p className="text-sm text-gray-600 leading-relaxed">{travelData.summary.meal}</p>
+                           </div>
+                        </div>
+
+                        {/* Tour */}
+                        <div className="flex gap-4">
+                           <div className="flex flex-col items-center w-6">
+                              <Camera className="w-5 h-5 text-gray-400" />
+                              <div className="w-[2px] h-full bg-gray-200 mt-2"></div>
+                           </div>
+                           <div className="flex-1 pb-4">
+                              <h3 className="text-base font-bold text-gray-800 mb-1">관광</h3>
+                              <ul className="text-sm text-gray-600 leading-relaxed list-disc list-inside space-y-1">
+                                {travelData.summary.tour.map((spot, idx) => (
+                                  <li key={idx}>{spot}</li>
+                                ))}
+                              </ul>
+                           </div>
+                        </div>
+
+                        {/* Hotels */}
+                        <div className="flex gap-4">
+                           <div className="flex flex-col items-center w-6">
+                              <Hotel className="w-5 h-5 text-gray-400" />
+                           </div>
+                           <div className="flex-1">
+                              <h3 className="text-base font-bold text-gray-800 mb-4">숙소</h3>
+                              <div className="space-y-6 pb-4">
+                                {travelData.summary.hotels.map((hotel, idx) => (
+                                   <div key={idx} className="relative">
+                                      <div className="absolute -left-[30px] top-2 w-2 h-2 rounded-full bg-gray-300"></div>
+                                      
+                                      <div className="flex items-center gap-2 mb-2">
+                                        <span className="font-bold text-sm text-gray-800">{hotel.badge}</span>
+                                        <span className="inline-block px-2 py-0.5 bg-orange-100 text-orange-600 text-[10px] font-bold rounded">
+                                          {hotel.count}
+                                        </span>
+                                      </div>
+                                      <div className="border border-gray-200 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow relative overflow-hidden">
+                                         {hotel.tags && hotel.tags.includes("조식 포함") && (
+                                           <div className="absolute top-0 right-0 bg-blue-500 text-white text-[10px] font-bold px-3 py-1 rounded-bl-lg">
+                                             조식 포함
+                                           </div>
+                                         )}
+                                         <h4 className="font-bold text-gray-800 text-sm mb-1">{hotel.name}</h4>
+                                         <p className="text-xs text-gray-500 mb-2">{hotel.desc}</p>
+                                         <a 
+                                            href={getGoogleMapsLink(hotel.query)} 
+                                            target="_blank" 
+                                            rel="noopener noreferrer"
+                                            className="text-xs text-blue-500 flex items-center hover:underline"
+                                         >
+                                            지도 보기 <ChevronRight className="w-3 h-3" />
+                                         </a>
+                                      </div>
                                    </div>
-                                 )}
-                                 <h4 className="font-bold text-gray-800 text-sm mb-1">{hotel.name}</h4>
-                                 <p className="text-xs text-gray-500 mb-2">{hotel.desc}</p>
-                                 <a 
-                                    href={getGoogleMapsLink(hotel.query)} 
-                                    target="_blank" 
-                                    rel="noopener noreferrer"
-                                    className="text-xs text-blue-500 flex items-center hover:underline"
-                                 >
-                                    지도 보기 <ChevronRight className="w-3 h-3" />
-                                 </a>
+                                ))}
                               </div>
                            </div>
-                        ))}
+                        </div>
                       </div>
-                   </div>
-                </div>
-              </div>
-            </section>
+                    </section>
 
-            <hr className="border-gray-100" />
+                    <hr className="border-gray-100" />
 
-            {/* 3. Detailed Itinerary */}
-            <div className="space-y-12">
-              {travelData.itinerary.map((day, dIdx) => (
-                <div key={dIdx} ref={el => dayRefs.current[dIdx] = el} className="scroll-mt-32">
-                  {/* Day Header */}
-                  <div className="flex items-center mb-6">
-                    <div className="bg-pink-600 text-white font-bold text-sm px-3 py-1 rounded-md shadow-sm mr-3">
-                      {day.day}일차
-                    </div>
-                    <div>
-                      <div className="font-bold text-lg text-gray-800">{day.date}</div>
-                      <div className="text-xs text-gray-500 flex items-center">
-                        <MapPin className="w-3 h-3 mr-1" /> {day.location}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Timeline */}
-                  <div className="pl-2 space-y-0">
-                    {day.events.map((event, eIdx) => {
-                      
-                      // Case 0: Flight Card Visualization
-                      if (event.type === 'flight_card') {
-                        return <FlightTimelineCard key={eIdx} flightInfo={event.flightInfo} type={dIdx === 0 ? 'departure' : 'arrival'} />;
-                      }
-
-                      // Check if it's a non-gallery event that needs a map link (Food/Shopping/Tour without gallery)
-                      const needsMapLink = !event.isGallery && (event.type === 'food' || event.type === 'shopping' || event.type === 'tour');
-
-                      return (
-                        <div key={eIdx} className="flex gap-4 relative pb-8 last:pb-0 group">
-                          {/* Vertical Line */}
-                          <div className="absolute left-[19px] top-2 bottom-0 w-[2px] bg-gray-100 group-last:hidden"></div>
-
-                          {/* Icon Logic */}
-                          <div className={`relative z-10 w-10 h-10 rounded-full border-4 border-white shadow-sm flex items-center justify-center flex-shrink-0
-                            ${event.type === 'flight' || event.type === 'arrival' ? 'bg-blue-100 text-blue-600' : 
-                              event.type === 'food' ? 'bg-orange-100 text-orange-600' : 
-                              event.type === 'hotel' ? 'bg-indigo-100 text-indigo-600' : 
-                              event.type === 'tour' ? 'bg-pink-100 text-pink-600' : 
-                              event.type === 'shopping' ? 'bg-purple-100 text-purple-600' :
-                              event.type === 'move' ? 'bg-slate-100 text-slate-600' :
-                              'bg-gray-100 text-gray-500'}`}>
-                            {event.type === 'food' && <Utensils className="w-4 h-4" />}
-                            {event.type === 'hotel' && <Hotel className="w-4 h-4" />}
-                            {event.type === 'tour' && <Camera className="w-4 h-4" />}
-                            {(event.type === 'flight' || event.type === 'arrival') && <Plane className="w-4 h-4" />}
-                            {event.type === 'shopping' && <ShoppingBag className="w-4 h-4" />}
-                            {event.type === 'move' && <Car className="w-4 h-4" />}
+                    {/* 3. Detailed Itinerary */}
+                    <div className="space-y-12">
+                      {travelData.itinerary.map((day, dIdx) => (
+                        <div key={dIdx} ref={el => dayRefs.current[dIdx] = el} className="scroll-mt-32">
+                          <div className="flex items-center mb-6">
+                            <div className="bg-pink-600 text-white font-bold text-sm px-3 py-1 rounded-md shadow-sm mr-3">
+                              {day.day}일차
+                            </div>
+                            <div>
+                              <div className="font-bold text-lg text-gray-800">{day.date}</div>
+                              <div className="text-xs text-gray-500 flex items-center">
+                                <MapPin className="w-3 h-3 mr-1" /> {day.location}
+                              </div>
+                            </div>
                           </div>
 
-                          {/* Content */}
-                          <div className="flex-1 pt-1 min-w-0">
-                            {/* HEADER - Updated Gallery Style with Chevron, or Standard with Map Link for Food/Shopping */}
-                            <div className="flex items-center gap-1 mb-1">
-                                {event.isGallery ? (
-                                  <h4 className="font-bold text-gray-900 text-lg flex items-center cursor-pointer hover:text-pink-600 transition-colors group/title"
-                                      onClick={() => window.open(getGoogleMapsLink(event.searchQuery || event.title), '_blank')}>
-                                    {event.title} <ChevronRight className="w-5 h-5 ml-1 text-gray-400 group-hover/title:text-pink-600 transition-colors" />
-                                  </h4>
-                                ) : needsMapLink ? (
-                                  <h4 className="font-bold text-gray-800 text-base flex items-center gap-1 cursor-pointer hover:text-pink-600 transition-colors group/title"
-                                      onClick={() => window.open(getGoogleMapsLink(event.searchQuery || event.title), '_blank')}>
-                                    {event.title} 
-                                    <span className="text-xs text-gray-400 group-hover/title:text-pink-600 bg-gray-100 group-hover/title:bg-pink-50 px-1.5 py-0.5 rounded-full flex items-center">
-                                      <MapPin className="w-3 h-3 mr-0.5" />지도
-                                    </span>
-                                  </h4>
-                                ) : (
-                                  <h4 className="font-bold text-gray-800 text-base">{event.title}</h4>
-                                )}
-                                
-                                {!event.isGallery && (
-                                  <span className="text-xs font-bold text-gray-400 ml-auto">{event.time}</span>
-                                )}
-                            </div>
-                            
-                            {/* DESCRIPTION */}
-                            <p className={`text-sm text-gray-600 leading-relaxed mb-3 ${event.isGallery ? 'font-medium' : ''}`}>
-                              {event.desc}
-                            </p>
+                          <div className="pl-2 space-y-0">
+                            {day.events.map((event, eIdx) => {
+                              if (event.type === 'flight_card') {
+                                return <FlightTimelineCard key={eIdx} flightInfo={event.flightInfo} type={dIdx === 0 ? 'departure' : 'arrival'} />;
+                              }
 
-                            {/* CASE 1: GALLERY MODE (Multiple Images - "Traveler's Street" Style) */}
-                            {event.isGallery && event.images && (
-                              <div className="mt-3">
-                                <div className="flex gap-3 overflow-x-auto pb-4 snap-x hide-scrollbar">
-                                  {event.images.map((imgUrl, i) => (
-                                    <div key={i} className="snap-center shrink-0 w-64 h-40 rounded-lg overflow-hidden relative shadow-sm border border-gray-100">
-                                      <img src={imgUrl} alt={`${event.title}-${i}`} className="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
+                              const needsMapLink = !event.isGallery && (event.type === 'food' || event.type === 'shopping' || event.type === 'tour');
+
+                              return (
+                                <div key={eIdx} className="flex gap-4 relative pb-8 last:pb-0 group">
+                                  <div className="absolute left-[19px] top-2 bottom-0 w-[2px] bg-gray-100 group-last:hidden"></div>
+
+                                  <div className={`relative z-10 w-10 h-10 rounded-full border-4 border-white shadow-sm flex items-center justify-center flex-shrink-0
+                                    ${event.type === 'flight' || event.type === 'arrival' ? 'bg-blue-100 text-blue-600' : 
+                                      event.type === 'food' ? 'bg-orange-100 text-orange-600' : 
+                                      event.type === 'hotel' ? 'bg-indigo-100 text-indigo-600' : 
+                                      event.type === 'tour' ? 'bg-pink-100 text-pink-600' : 
+                                      event.type === 'shopping' ? 'bg-purple-100 text-purple-600' :
+                                      event.type === 'move' ? 'bg-slate-100 text-slate-600' :
+                                      'bg-gray-100 text-gray-500'}`}>
+                                    {event.type === 'food' && <Utensils className="w-4 h-4" />}
+                                    {event.type === 'hotel' && <Hotel className="w-4 h-4" />}
+                                    {event.type === 'tour' && <Camera className="w-4 h-4" />}
+                                    {(event.type === 'flight' || event.type === 'arrival') && <Plane className="w-4 h-4" />}
+                                    {event.type === 'shopping' && <ShoppingBag className="w-4 h-4" />}
+                                    {event.type === 'move' && <Car className="w-4 h-4" />}
+                                  </div>
+
+                                  <div className="flex-1 pt-1 min-w-0">
+                                    <div className="flex items-center gap-1 mb-1">
+                                        {event.isGallery ? (
+                                          <h4 className="font-bold text-gray-900 text-lg flex items-center cursor-pointer hover:text-pink-600 transition-colors group/title"
+                                              onClick={() => window.open(getGoogleMapsLink(event.searchQuery || event.title), '_blank')}>
+                                            {event.title} <ChevronRight className="w-5 h-5 ml-1 text-gray-400 group-hover/title:text-pink-600 transition-colors" />
+                                          </h4>
+                                        ) : needsMapLink ? (
+                                          <h4 className="font-bold text-gray-800 text-base flex items-center gap-1 cursor-pointer hover:text-pink-600 transition-colors group/title"
+                                              onClick={() => window.open(getGoogleMapsLink(event.searchQuery || event.title), '_blank')}>
+                                            {event.title} 
+                                            <span className="text-xs text-gray-400 group-hover/title:text-pink-600 bg-gray-100 group-hover/title:bg-pink-50 px-1.5 py-0.5 rounded-full flex items-center">
+                                              <MapPin className="w-3 h-3 mr-0.5" />지도
+                                            </span>
+                                          </h4>
+                                        ) : (
+                                          <h4 className="font-bold text-gray-800 text-base">{event.title}</h4>
+                                        )}
+                                        
+                                        {!event.isGallery && (
+                                          <span className="text-xs font-bold text-gray-400 ml-auto">{event.time}</span>
+                                        )}
                                     </div>
-                                  ))}
-                                  {/* "See More" Fake Card */}
-                                  <div className="snap-center shrink-0 w-24 h-40 rounded-lg bg-gray-50 border border-gray-200 flex flex-col items-center justify-center text-gray-400 hover:bg-gray-100 cursor-pointer"
-                                     onClick={() => window.open(getGoogleMapsLink(event.searchQuery || event.title), '_blank')}>
-                                    <Camera className="w-6 h-6 mb-1" />
-                                    <span className="text-xs">더보기</span>
+                                    
+                                    <p className={`text-sm text-gray-600 leading-relaxed mb-3 ${event.isGallery ? 'font-medium' : ''}`}>
+                                      {event.desc}
+                                    </p>
+
+                                    {event.isGallery && event.images && (
+                                      <div className="mt-3">
+                                        <div className="flex gap-3 overflow-x-auto pb-4 snap-x hide-scrollbar">
+                                          {event.images.map((imgUrl, i) => (
+                                            <div key={i} className="snap-center shrink-0 w-64 h-40 rounded-lg overflow-hidden relative shadow-sm border border-gray-100">
+                                              <img src={imgUrl} alt={`${event.title}-${i}`} className="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
+                                            </div>
+                                          ))}
+                                          <div className="snap-center shrink-0 w-24 h-40 rounded-lg bg-gray-50 border border-gray-200 flex flex-col items-center justify-center text-gray-400 hover:bg-gray-100 cursor-pointer"
+                                             onClick={() => window.open(getGoogleMapsLink(event.searchQuery || event.title), '_blank')}>
+                                            <Camera className="w-6 h-6 mb-1" />
+                                            <span className="text-xs">더보기</span>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    )}
                                   </div>
                                 </div>
-                              </div>
-                            )}
-
-                            {/* CASE 2: SINGLE CARD MODE (Removed for Food/Shopping as requested) */}
-                            {/* hasCard check removed for food/shopping in data, but keeping the structure if needed later for other types */}
-                            {event.hasCard && !event.isGallery && (
-                              <div className="mt-3 bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-                                <div className="aspect-video w-full bg-gray-100 relative">
-                                  <img src={event.image} alt={event.title} className="w-full h-full object-cover object-center" />
-                                </div>
-                                <div className="p-3 bg-gray-50">
-                                  <a 
-                                    href={getGoogleMapsLink(event.searchQuery || event.title)} 
-                                    target="_blank" 
-                                    rel="noopener noreferrer"
-                                    className="flex items-center justify-between text-xs text-gray-500 hover:text-pink-600 transition-colors"
-                                  >
-                                    <span className="flex items-center"><MapPin className="w-3 h-3 mr-1" /> 위치 보기 (구글맵)</span>
-                                    <ExternalLink className="w-3 h-3" />
-                                  </a>
-                                </div>
-                              </div>
-                            )}
+                              );
+                            })}
                           </div>
                         </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </>
-      )}
-
-      {activeTab === 'shopping' && (
-        <div className="p-5 animate-fadeIn">
-          {/* New Section: Prepaid Costs */}
-          <div className="bg-white border border-blue-200 rounded-xl p-5 mb-6 shadow-sm">
-            <h3 className="text-lg font-bold text-blue-800 mb-3 flex items-center">
-              <CreditCard className="w-5 h-5 mr-2" /> 사전 경비 (예약/결제)
-            </h3>
-            <div className="space-y-3">
-              {travelData.prepaidCosts.map((cost, idx) => (
-                <div key={idx} className="flex justify-between items-center text-sm border-b border-gray-100 last:border-0 pb-2 last:pb-0">
-                  <span className="text-gray-600">{cost.item}</span>
-                  <span className="font-bold text-blue-600">{cost.cost}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Cost Summary Box (Existing) */}
-          <div className="bg-gradient-to-r from-teal-50 to-teal-100 p-5 rounded-xl border border-teal-200 mb-6">
-            <h3 className="text-lg font-bold text-teal-800 mb-3 flex items-center">
-              <Wallet className="w-5 h-5 mr-2" /> 3인 가족 현지 예상 경비
-            </h3>
-            <div className="space-y-2 text-sm text-teal-900">
-              <div className="flex justify-between border-b border-teal-200 pb-1">
-                <span>식비/간식</span>
-                <span className="font-bold">약 43,000엔</span>
-              </div>
-              <div className="flex justify-between border-b border-teal-200 pb-1">
-                <span>교통/주유</span>
-                <span className="font-bold">약 8,900엔</span>
-              </div>
-              <div className="flex justify-between border-b border-teal-200 pb-1">
-                <span>입장료/체험</span>
-                <span className="font-bold">약 2,800엔 + α</span>
-              </div>
-              <div className="flex justify-between pt-1">
-                <span>쇼핑</span>
-                <span className="font-bold">약 29,000엔~</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 gap-4">
-            {travelData.shopping.map((shop, idx) => (
-              <div key={idx} className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex gap-4">
-                <div className="w-12 h-12 rounded-full bg-gray-50 flex items-center justify-center flex-shrink-0">
-                  {shop.icon}
-                </div>
-                <div className="flex-1">
-                  <div className="flex justify-between items-start">
-                    <h4 className="font-bold text-gray-800">{shop.name}</h4>
-                    <span className="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded">{shop.category}</span>
-                  </div>
-                  <p className="text-sm text-gray-500 mt-1 mb-2">{shop.desc}</p>
-                  <div className="bg-pink-50 p-2 rounded-lg">
-                    <span className="text-xs font-bold text-pink-700 block mb-1">🔥 주요 품목</span>
-                    <div className="flex flex-wrap gap-2">
-                      {shop.mustBuy.map((item, mIdx) => (
-                        <span key={mIdx} className="text-xs bg-white text-pink-600 border border-pink-100 px-2 py-0.5 rounded-full flex items-center">
-                          <CheckCircle className="w-3 h-3 mr-1" /> {item}
-                        </span>
                       ))}
                     </div>
                   </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
-  );
-};
+                </>
+              )}
 
-export default App;
+              {activeTab === 'shopping' && (
+                <div className="p-5 animate-fadeIn">
+                  <div className="bg-white border border-blue-200 rounded-xl p-5 mb-6 shadow-sm">
+                    <h3 className="text-lg font-bold text-blue-800 mb-3 flex items-center">
+                      <CreditCard className="w-5 h-5 mr-2" /> 사전 경비 (예약/결제)
+                    </h3>
+                    <div className="space-y-3">
+                      {travelData.prepaidCosts.map((cost, idx) => (
+                        <div key={idx} className="flex justify-between items-center text-sm border-b border-gray-100 last:border-0 pb-2 last:pb-0">
+                          <span className="text-gray-600">{cost.item}</span>
+                          <span className="font-bold text-blue-600">{cost.cost}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="bg-gradient-to-r from-teal-50 to-teal-100 p-5 rounded-xl border border-teal-200 mb-6">
+                    <h3 className="text-lg font-bold text-teal-800 mb-3 flex items-center">
+                      <Wallet className="w-5 h-5 mr-2" /> 3인 가족 현지 예상 경비
+                    </h3>
+                    <div className="space-y-2 text-sm text-teal-900">
+                      <div className="flex justify-between border-b border-teal-200 pb-1">
+                        <span>식비/간식</span>
+                        <span className="font-bold">약 43,000엔</span>
+                      </div>
+                      <div className="flex justify-between border-b border-teal-200 pb-1">
+                        <span>교통/주유</span>
+                        <span className="font-bold">약 8,900엔</span>
+                      </div>
+                      <div className="flex justify-between border-b border-teal-200 pb-1">
+                        <span>입장료/체험</span>
+                        <span className="font-bold">약 2,800엔 + α</span>
+                      </div>
+                      <div className="flex justify-between pt-1">
+                        <span>쇼핑</span>
+                        <span className="font-bold">약 29,000엔~</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 gap-4">
+                    {travelData.shopping.map((shop, idx) => (
+                      <div key={idx} className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex gap-4">
+                        <div className="w-12 h-12 rounded-full bg-gray-50 flex items-center justify-center flex-shrink-0">
+                          {shop.icon}
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex justify-between items-start">
+                            <h4 className="font-bold text-gray-800">{shop.name}</h4>
+                            <span className="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded">{shop.category}</span>
+                          </div>
+                          <p className="text-sm text-gray-500 mt-1 mb-2">{shop.desc}</p>
+                          <div className="bg-pink-50 p-2 rounded-lg">
+                            <span className="text-xs font-bold text-pink-700 block mb-1">🔥 주요 품목</span>
+                            <div className="flex flex-wrap gap-2">
+                              {shop.mustBuy.map((item, mIdx) => (
+                                <span key={mIdx} className="text-xs bg-white text-pink-600 border border-pink-100 px-2 py-0.5 rounded-full flex items-center">
+                                  <CheckCircle className="w-3 h-3 mr-1" /> {item}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
