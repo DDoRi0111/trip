@@ -1,775 +1,1125 @@
-
 <!DOCTYPE html>
+
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>행복만땅 3대 가족투어</title>
-    <!-- Fonts & Icons -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: { sans: ['Noto Sans KR', 'sans-serif'] },
-                    colors: {
-                        brand: '#059669', /* 가족여행에 어울리는 따뜻한 그린 */
-                        point: '#ea580c', /* 포인트 오렌지 */
-                    }
-                }
-            }
-        }
-    </script>
-    <style>
-        body { background-color: #f8fafc; }
-        .mobile-container {
-            max-width: 480px;
-            margin: 0 auto;
-            background-color: #ffffff;
-            min-height: 100vh;
-            box-shadow: 0 0 25px rgba(0,0,0,0.05);
-            position: relative;
-        }
-        /* Hide scrollbar */
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        
-        .tab-content { display: none; }
-        .tab-content.active { display: block; animation: fadeIn 0.4s ease-in-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>행복만땅 규슈 렌터카 여행 🚗</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; }
+body {
+  font-family: 'Noto Sans KR', sans-serif;
+  background: #D8D0C4;
+  color: #1C1C1A;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+:root {
+  --green:    #2D5A3D;
+  --green-l:  #4A7C5F;
+  --green-bg: #ECF3EE;
+  --terra:    #C9783A;
+  --terra-bg: #FDF0E6;
+  --cream:    #F9F5EF;
+  --cream-d:  #EDE8E1;
+  --card:     #FFFFFF;
+  --ink:      #1C1C1A;
+  --ink-m:    #5A5A52;
+  --ink-l:    #9A9A8E;
+  --border:   #E2DBD1;
+}
 
-        /* 히어로 배경 */
-        .hero-img {
-            height: 300px;
-            border-radius: 0;
-            background: linear-gradient(rgba(5, 150, 105, 0.8), rgba(15, 23, 42, 0.8));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-        }
+/* ── Shell (responsive) ─────────────────────── */
+.shell {
+max-width: 520px;
+margin: 0 auto;
+background: var(–cream);
+min-height: 100vh;
+box-shadow: 0 0 80px rgba(0,0,0,.15);
+}
+@media (min-width: 560px) {
+body { padding: 24px 0 40px; }
+.shell { border-radius: 18px; overflow: hidden; min-height: auto; }
+}
 
-        /* 타임라인 디자인 */
-        .timeline-item {
-            position: relative;
-            padding-left: 32px;
-            padding-bottom: 36px;
-        }
-        .timeline-item::before {
-            content: '';
-            position: absolute;
-            left: 9px;
-            top: 28px;
-            bottom: 0;
-            width: 2px;
-            background-color: #e2e8f0;
-        }
-        .timeline-item:last-child::before { display: none; }
-        
-        .timeline-icon {
-            position: absolute;
-            left: -3px;
-            top: 2px;
-            width: 26px;
-            height: 26px;
-            border-radius: 50%;
-            background-color: #059669;
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 11px;
-            z-index: 10;
-            box-shadow: 0 0 0 4px #ffffff;
-        }
-    </style>
+/* ── Hero ───────────────────────────────────── */
+.hero {
+background: var(–green);
+position: relative; overflow: hidden;
+padding: 48px 28px 32px;
+}
+.hero::before {
+content: ‘’;
+position: absolute; inset: 0;
+background:
+radial-gradient(ellipse 160% 80% at 110% 120%, #1a3d28 0%, transparent 60%),
+radial-gradient(ellipse 80% 60% at -10% -10%, #3d7a55 0%, transparent 50%);
+}
+.hero-rings {
+position: absolute; top: -50px; right: -50px;
+width: 240px; height: 240px; border-radius: 50%;
+border: 1px solid rgba(255,255,255,.07); pointer-events: none;
+}
+.hero-rings::before { content:’’; position:absolute; inset:28px; border-radius:50%; border:1px solid rgba(255,255,255,.05); }
+.hero-rings::after  { content:’’; position:absolute; inset:56px; border-radius:50%; border:1px solid rgba(255,255,255,.04); }
+
+.hero-badge {
+display: inline-flex; align-items: center; gap: 6px;
+background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.2);
+color: rgba(255,255,255,.85); font-size: 11px; font-weight: 700; letter-spacing: .06em;
+padding: 4px 12px; border-radius: 20px; margin-bottom: 16px; position: relative;
+}
+.hero-sub {
+font-family: ‘Playfair Display’, serif; font-style: italic;
+font-size: 13px; color: rgba(255,255,255,.45); letter-spacing: .04em;
+margin-bottom: 8px; position: relative;
+}
+.hero-title {
+font-size: 30px; font-weight: 900; line-height: 1.2; color: #fff;
+letter-spacing: -.02em; margin-bottom: 22px; position: relative;
+}
+.hero-route {
+display: flex; gap: 8px; align-items: center; flex-wrap: wrap; position: relative;
+}
+.hero-pill {
+background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.22);
+color: rgba(255,255,255,.9); font-size: 11px; font-weight: 700;
+padding: 4px 11px; border-radius: 4px;
+}
+.hero-arr { color: rgba(255,255,255,.25); font-size: 10px; }
+
+/* ── Trip Info Bar ──────────────────────────── */
+.trip-info {
+background: var(–card);
+border-bottom: 1px solid var(–border);
+display: flex; align-items: stretch;
+}
+.ti-item {
+flex: 1; display: flex; flex-direction: column;
+align-items: center; justify-content: center; gap: 4px;
+padding: 14px 6px;
+border-right: 1px solid var(–border);
+}
+.ti-item:last-child { border-right: none; }
+.ti-icon { font-size: 20px; line-height: 1; }
+.ti-lbl { font-size: 9px; font-weight: 700; color: var(–ink-l); letter-spacing: .05em; }
+.ti-val { font-size: 12px; font-weight: 900; color: var(–ink); text-align: center; line-height: 1.3; }
+
+/* ── Sticky Nav ─────────────────────────────── */
+.sticky-nav { position: sticky; top: 0; z-index: 100; background: var(–card); border-bottom: 1px solid var(–border); }
+.tabs { display: flex; }
+.tab-btn {
+flex: 1; padding: 13px 8px;
+font-size: 13px; font-weight: 700; font-family: ‘Noto Sans KR’, sans-serif;
+color: var(–ink-l); background: none; border: none; cursor: pointer;
+border-bottom: 2px solid transparent; transition: all .2s;
+}
+.tab-btn.active { color: var(–green); border-bottom-color: var(–green); }
+
+/* ── Tab Views ──────────────────────────────── */
+.tab-view { display: none; }
+.tab-view.active { display: block; animation: fadeUp .3s ease; }
+@keyframes fadeUp { from { opacity:0; transform:translateY(7px); } to { opacity:1; transform:none; } }
+
+/* ── Day Section ────────────────────────────── */
+.day-sec { padding: 26px 20px 8px; }
+.day-badge { display: inline-flex; align-items: center; gap: 8px; margin-bottom: 9px; }
+.day-num {
+background: var(–green); color: #fff;
+font-size: 10px; font-weight: 900; letter-spacing: .1em;
+padding: 3px 10px; border-radius: 3px;
+}
+.day-date { font-size: 12px; color: var(–ink-l); font-weight: 500; }
+.day-title { font-size: 21px; font-weight: 900; letter-spacing: -.02em; line-height: 1.2; }
+.day-sub { font-size: 12px; color: var(–ink-l); margin-top: 4px; }
+.day-divider { margin: 6px 20px 24px; height: 1px; background: linear-gradient(to right, var(–green), transparent); opacity: .2; }
+
+/* ── Flight Card ────────────────────────────── */
+.flight-card {
+margin: 14px 20px;
+background: var(–card); border: 1px solid var(–border);
+border-radius: 14px; padding: 16px 18px;
+display: flex; gap: 14px; align-items: stretch;
+}
+.fc-times { display: flex; flex-direction: column; justify-content: space-between; min-width: 54px; }
+.fc-time { font-size: 19px; font-weight: 900; letter-spacing: -.02em; }
+.fc-city { font-size: 10px; color: var(–ink-l); font-weight: 600; margin-top: 1px; }
+.fc-line { display: flex; flex-direction: column; align-items: center; padding: 2px 0; }
+.fc-dot { width: 8px; height: 8px; border-radius: 50%; background: var(–border); flex-shrink: 0; }
+.fc-dot.arr { background: var(–green); }
+.fc-stem { width: 1px; flex: 1; background: var(–border); margin: 4px 0; position: relative; }
+.fc-plane { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); font-size: 13px; background: var(–cream); padding: 1px 0; }
+.fc-info { flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
+.fc-from, .fc-to { font-size: 14px; font-weight: 700; }
+.fc-airline { display: inline-flex; align-items: center; gap: 6px; margin-top: 4px; }
+.fc-badge { background: #D32F2F; color: #fff; font-size: 9px; font-weight: 900; letter-spacing: .08em; padding: 2px 6px; border-radius: 3px; font-style: italic; }
+.fc-fnum { font-size: 11px; color: var(–ink-l); }
+.fc-dur { font-size: 11px; font-weight: 700; color: var(–green); margin-top: 2px; }
+
+/* ── Scene Card ─────────────────────────────── */
+.scene-card {
+margin: 0 20px 14px;
+background: var(–card); border: 1px solid var(–border);
+border-radius: 14px; overflow: hidden;
+}
+
+/* Art 배경 */
+.scene-art {
+height: 140px; position: relative;
+display: flex; align-items: flex-end; padding: 12px 16px; overflow: hidden;
+}
+.scene-art-bg {
+position: absolute; inset: 0;
+background-size: cover; background-position: center;
+transition: transform .4s ease;
+}
+.scene-card:hover .scene-art-bg { transform: scale(1.04); }
+.scene-art-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,.6) 0%, rgba(0,0,0,.15) 60%, transparent 100%); }
+.scene-art-emoji {
+font-size: 56px; position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+opacity: .15; filter: saturate(0); pointer-events: none; user-select: none; z-index: 1;
+}
+.scene-art-label { font-family: ‘Playfair Display’, serif; font-style: italic; font-size: 10px; color: rgba(255,255,255,.65); letter-spacing: .06em; position: relative; z-index: 2; }
+.scene-art-title { font-size: 17px; font-weight: 900; color: #fff; line-height: 1.2; position: relative; z-index: 2; }
+
+/* Art gradient fallbacks */
+.art-bridge-new { background: linear-gradient(145deg, #1e3a5f 0%, #2d6a9f 50%, #1a2d4a 100%); }
+.art-gorge      { background: linear-gradient(135deg, #1a3d1a 0%, #3d6b3d 50%, #0f2d0f 100%); }
+.art-kusa       { background: linear-gradient(145deg, #2d4a1a 0%, #5c8a3a 50%, #1e3a0f 100%); }
+.art-jinja      { background: linear-gradient(135deg, #5c3a1a 0%, #8b5e3c 50%, #4a2a10 100%); }
+.art-hbridge    { background: linear-gradient(145deg, #1a3a5c 0%, #2d5c8a 50%, #1a2d5c 100%); }
+.art-beppu      { background: linear-gradient(135deg, #4a1a1a 0%, #8b2d2d 40%, #5c1a40 100%); }
+.art-jigoku     { background: linear-gradient(145deg, #4a2000 0%, #c9532a 50%, #8b2000 100%); }
+.art-safari     { background: linear-gradient(135deg, #3d2e00 0%, #8b6914 50%, #5c4400 100%); }
+.art-yufuin     { background: linear-gradient(145deg, #1a2d5c 0%, #3a5c8a 50%, #1a3a6b 100%); }
+.art-daikan     { background: linear-gradient(135deg, #2a1a3d 0%, #5c3a8a 50%, #1a0a2d 100%); }
+.art-kumamoto   { background: linear-gradient(145deg, #1a1a3d 0%, #2d2d6b 50%, #0a0a2a 100%); }
+.art-suizen     { background: linear-gradient(135deg, #1a3d2a 0%, #3a6b50 50%, #0a2d1a 100%); }
+.art-renew      { background: linear-gradient(145deg, #2d1a00 0%, #6b3a00 50%, #3d2200 100%); }
+
+.scene-body { padding: 13px 16px 15px; }
+
+/* ── Time Row (이동·도착·체류 명확 구분) ─────── */
+.time-row {
+display: flex; align-items: center; flex-wrap: wrap;
+gap: 5px; margin-bottom: 9px;
+}
+.tr-arr {
+font-size: 14px; font-weight: 900; color: var(–ink);
+white-space: nowrap;
+}
+.tr-arr-lbl { font-size: 9px; font-weight: 700; color: var(–ink-l); }
+.tr-move {
+font-size: 10px; font-weight: 700; color: var(–ink-m);
+background: var(–cream-d); border: 1px solid var(–border);
+padding: 2px 8px; border-radius: 10px; white-space: nowrap;
+}
+.tr-stay {
+font-size: 10px; font-weight: 700; color: var(–green);
+background: var(–green-bg); border: 1px solid #B8D9C4;
+padding: 2px 8px; border-radius: 10px; white-space: nowrap;
+}
+.tr-warn {
+font-size: 10px; font-weight: 700; color: #B45309;
+background: #FEF3C7; border: 1px solid #FDE68A;
+padding: 2px 8px; border-radius: 10px; white-space: nowrap;
+}
+.scene-head { font-size: 15px; font-weight: 900; color: var(–ink); line-height: 1.3; margin-bottom: 5px; }
+.scene-tagline { font-size: 12px; font-weight: 700; color: var(–green); margin-bottom: 5px; }
+
+/* ── Toggle Description ─────────────────────── */
+.desc-short { font-size: 13px; color: var(–ink-m); line-height: 1.65; }
+.desc-full { display: none; }
+.desc-full.open { display: block; }
+.desc-full p { font-size: 13px; color: var(–ink-m); line-height: 1.7; margin-top: 8px; }
+.tip-box {
+background: #FFF8ED; border: 1px solid #F0D8A8; border-left: 3px solid var(–terra);
+border-radius: 8px; padding: 9px 12px; margin-top: 9px;
+font-size: 12px; color: #7A4A10; line-height: 1.6; font-weight: 500;
+}
+.warn-box {
+background: #FFF2EC; border: 1px solid #F5C6A0; border-left: 3px solid #E07040;
+border-radius: 8px; padding: 9px 12px; margin-top: 9px;
+font-size: 12px; color: #8B3A10; line-height: 1.6; font-weight: 500;
+}
+.info-list { margin-top: 8px; }
+.info-row {
+display: flex; justify-content: space-between;
+font-size: 12px; padding: 6px 0; border-bottom: 1px solid var(–border); color: var(–ink-m);
+}
+.info-row:last-child { border-bottom: none; }
+.info-row span:last-child { font-weight: 700; color: var(–ink); }
+
+.toggle-btn {
+display: inline-flex; align-items: center; gap: 4px;
+font-size: 11px; font-weight: 700; color: var(–green);
+background: var(–green-bg); border: 1px solid #B8D9C4;
+padding: 4px 10px; border-radius: 20px; cursor: pointer;
+margin-top: 9px; font-family: ‘Noto Sans KR’, sans-serif;
+transition: background .15s;
+}
+.toggle-btn:hover { background: #D0EAD8; }
+.tgl-icon { font-size: 8px; display: inline-block; transition: transform .2s; }
+.toggle-btn.open .tgl-icon { transform: rotate(180deg); }
+
+/* ── Food Section ───────────────────────────── */
+.food-sec { margin-top: 11px; padding-top: 9px; border-top: 1px dashed var(–border); }
+.food-lbl { font-size: 10px; font-weight: 700; color: var(–ink-l); letter-spacing: .06em; margin-bottom: 6px; }
+.chips { display: flex; flex-wrap: wrap; gap: 5px; }
+.chip {
+font-size: 11px; font-weight: 600;
+background: var(–cream-d); border: 1px solid var(–border);
+color: var(–ink-m); padding: 3px 9px; border-radius: 10px;
+}
+.chip.main { background: var(–terra-bg); border-color: #E8B88A; color: #7A3A00; }
+.chip.note { font-size: 10px; background: none; border: none; color: var(–ink-l); padding: 3px 0; width: 100%; }
+
+/* ── Meal Row ───────────────────────────────── */
+.meal-row {
+display: grid; grid-template-columns: repeat(4,1fr);
+margin: 6px 20px 0; border: 1px solid var(–border);
+border-radius: 10px; overflow: hidden; background: var(–card);
+}
+.meal-cell { padding: 9px 4px; text-align: center; border-right: 1px solid var(–border); }
+.meal-cell:last-child { border-right: none; }
+.m-lbl { font-size: 9px; font-weight: 700; color: var(–ink-l); letter-spacing: .08em; margin-bottom: 3px; }
+.m-val { font-size: 11px; font-weight: 700; color: var(–ink); line-height: 1.3; }
+.m-val.inc { color: var(–green); }
+
+/* ── Budget View ────────────────────────────── */
+.budget-view { padding: 20px; background: var(–cream-d); }
+.budget-total {
+background: var(–green); color: #fff;
+border-radius: 16px; padding: 24px 20px; text-align: center;
+margin-bottom: 18px; position: relative; overflow: hidden;
+}
+.budget-total::before {
+content: ‘¥’; font-family: ‘Playfair Display’, serif;
+font-size: 120px; font-weight: 700; color: rgba(255,255,255,.05);
+position: absolute; top: -20px; right: -8px; line-height: 1; pointer-events: none;
+}
+.bt-label { font-size: 12px; font-weight: 700; color: rgba(255,255,255,.6); margin-bottom: 6px; letter-spacing: .04em; }
+.bt-amount { font-size: 38px; font-weight: 900; letter-spacing: -.03em; }
+.bt-sub { font-size: 11px; color: rgba(255,255,255,.45); margin-top: 4px; }
+.bt-badge {
+display: inline-block; margin-top: 14px;
+background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.22);
+font-size: 11px; font-weight: 700; color: rgba(255,255,255,.85);
+padding: 5px 14px; border-radius: 20px;
+}
+.chart-card {
+background: var(–card); border: 1px solid var(–border);
+border-radius: 14px; padding: 20px; margin-bottom: 16px;
+}
+.chart-card h3 { font-size: 14px; font-weight: 800; color: var(–ink); margin-bottom: 16px; text-align: center; }
+.chart-wrap { max-width: 220px; margin: 0 auto; }
+.bsec-title { font-size: 10px; font-weight: 900; color: var(–ink-l); letter-spacing: .1em; margin-bottom: 9px; padding-left: 2px; }
+.bcard { background: var(–card); border: 1px solid var(–border); border-radius: 12px; overflow: hidden; margin-bottom: 10px; }
+.bcard-head {
+padding: 11px 16px; border-bottom: 1px solid var(–border);
+display: flex; justify-content: space-between; align-items: center; background: #FAFAF8;
+}
+.bh-lbl { font-size: 10px; font-weight: 700; color: var(–ink-l); margin-bottom: 2px; letter-spacing: .06em; }
+.bh-title { font-size: 14px; font-weight: 800; color: var(–ink); }
+.bh-amt { font-size: 15px; font-weight: 900; color: var(–green); }
+.bcard-body { padding: 11px 16px; }
+.b-row {
+display: flex; justify-content: space-between; align-items: flex-start;
+padding: 7px 0; border-bottom: 1px solid #F0EAE0; font-size: 13px;
+}
+.b-row:last-child { border-bottom: none; }
+.b-label { color: var(–ink-m); }
+.b-amt { font-weight: 700; color: var(–ink); text-align: right; }
+.b-sub { font-size: 10px; color: var(–ink-l); margin-top: 1px; }
+.b-note {
+background: var(–terra-bg); border: 1px solid #E8C8A0;
+border-radius: 8px; padding: 7px 12px; margin-bottom: 10px;
+font-size: 11px; font-weight: 700; color: #7A4A10; text-align: center;
+}
+.b-total-row {
+display: flex; justify-content: space-between; align-items: center;
+padding: 9px 0 0; margin-top: 5px; border-top: 1px solid var(–border);
+font-size: 13px; font-weight: 900; color: var(–ink);
+}
+.final-card {
+background: var(–ink); border-radius: 14px; padding: 20px; margin-top: 16px; margin-bottom: 8px;
+}
+.final-card .row {
+display: flex; justify-content: space-between;
+font-size: 12px; padding: 7px 0; border-bottom: 1px solid rgba(255,255,255,.08);
+color: rgba(255,255,255,.55);
+}
+.final-card .row span:last-child { color: rgba(255,255,255,.88); font-weight: 700; }
+.final-card .total-row { display: flex; justify-content: space-between; align-items: center; padding: 14px 0 0; margin-top: 4px; }
+.final-card .tot-lbl { font-size: 14px; font-weight: 700; color: rgba(255,255,255,.65); }
+.final-card .tot-amt { font-size: 26px; font-weight: 900; color: #6EE7A8; }
+.final-card .tot-note { font-size: 10px; color: rgba(255,255,255,.3); margin-top: 6px; text-align: right; }
+</style>
+
 </head>
-<body class="text-slate-800 antialiased font-sans">
+<body>
+<div class="shell">
 
-<div class="mobile-container pb-10">
-    <!-- Top Navigation Bar -->
-    <header class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-slate-100">
-        <div class="flex items-center justify-center px-4 h-14 relative">
-            <h1 class="font-bold text-lg tracking-tight text-slate-800">행복만땅 3대 가족투어 🚩</h1>
-        </div>
-    </header>
+<!-- ── HERO ─────────────────────────────────── -->
 
-    <!-- Hero Section -->
-    <div class="hero-img relative p-6 flex flex-col justify-end text-left">
-        <div class="relative z-10 w-full text-white">
-            <div class="flex gap-2 mb-3">
-                <span class="bg-white/20 backdrop-blur-sm border border-white/30 text-white text-[11px] px-2 py-0.5 rounded">프리미엄 가족기획</span>
-                <span class="bg-white/20 backdrop-blur-sm border border-white/30 text-white text-[11px] px-2 py-0.5 rounded">4박 5일</span>
-            </div>
-            <h2 class="text-3xl font-black leading-tight mb-2">5월의 규슈,<br>대자연 렌터카 일주</h2>
-            <p class="text-sm text-white/80 font-light mt-2"><i class="fa-solid fa-route mr-1.5"></i>아소 ➔ 벳푸 ➔ 구마모토</p>
-        </div>
-    </div>
-
-    <!-- 핵심 요약 정보 -->
-    <div class="p-6 border-b-8 border-slate-50">
-        <div class="bg-slate-50 rounded-xl p-5 space-y-4 border border-slate-100 shadow-sm">
-            <div class="flex items-start gap-3">
-                <div class="bg-blue-100 text-blue-600 w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5"><i class="fa-solid fa-plane-departure text-sm"></i></div>
-                <div class="text-sm w-full">
-                    <p class="font-bold text-slate-800 mb-1">항공 일정 (이스타항공)</p>
-                    <div class="mt-1.5">
-                        <p class="text-slate-600 text-[13px] mb-1">🛫 05/15(금) 12:30 부산 출발 ➔ 13:50 구마모토 도착</p>
-                        <p class="text-slate-600 text-[13px]">🛬 05/19(화) 14:50 구마모토 출발 ➔ 15:55 부산 도착</p>
-                    </div>
-                </div>
-            </div>
-            <div class="w-full h-px bg-slate-200"></div>
-            <div class="flex items-start gap-3">
-                <div class="bg-emerald-100 text-emerald-600 w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5"><i class="fa-solid fa-car text-sm"></i></div>
-                <div class="text-sm">
-                    <p class="font-bold text-slate-800 mb-1">우리 가족 이동수단</p>
-                    <p class="text-slate-600">토요타 복시/노아 (편안한 7~8인승)</p>
-                </div>
-            </div>
-            <div class="w-full h-px bg-slate-200"></div>
-            <div class="flex items-start gap-3">
-                <div class="bg-orange-100 text-orange-600 w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5"><i class="fa-solid fa-hot-tub-person text-sm"></i></div>
-                <div class="text-sm">
-                    <p class="font-bold text-slate-800 mb-1">프리미엄 숙박 정보</p>
-                    <p class="text-slate-600">전일정 조식 포함 & 피로를 녹이는 온천 호텔</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Sticky Tabs -->
-    <div class="sticky top-14 z-40 bg-white border-b border-slate-200 shadow-sm flex text-sm font-bold text-slate-400">
-        <button id="tab-itinerary" onclick="switchTab('itinerary')" class="w-1/2 py-3.5 text-brand border-b-2 border-brand transition-colors">상세 일정표</button>
-        <button id="tab-budget" onclick="switchTab('budget')" class="w-1/2 py-3.5 border-b-2 border-transparent transition-colors">여행 예산안</button>
-    </div>
-
-    <!-- ==================== VIEW 1: 상세 일정 ==================== -->
-    <div id="view-itinerary" class="tab-content active p-6 bg-white">
-        
-        <!-- DAY 1 -->
-        <div class="mb-12">
-            <div class="flex justify-between items-end mb-5 border-b border-slate-100 pb-3">
-                <div>
-                    <div class="text-brand font-black text-sm mb-1 tracking-wider">DAY 1</div>
-                    <div class="font-bold text-xl text-slate-800">설레는 출발, 아소 입성</div>
-                </div>
-            </div>
-
-            <!-- 항공 UI (1일차) -->
-            <div class="bg-white rounded-xl border border-slate-200 p-4 mb-6 shadow-sm">
-                <div class="flex items-stretch gap-4">
-                    <div class="flex flex-col justify-between text-right w-16 flex-shrink-0">
-                        <div>
-                            <div class="text-lg font-black text-slate-800 leading-none">12:30</div>
-                            <div class="text-[11px] text-slate-400 mt-1">05/15(금)</div>
-                        </div>
-                        <div class="py-3"></div>
-                        <div>
-                            <div class="text-lg font-black text-slate-800 leading-none">13:50</div>
-                            <div class="text-[11px] text-slate-400 mt-1">05/15(금)</div>
-                        </div>
-                    </div>
-                    <div class="flex flex-col items-center py-1 relative">
-                        <div class="w-2.5 h-2.5 rounded-full bg-slate-300 z-10"></div>
-                        <div class="w-0.5 bg-slate-200 flex-grow my-1"></div>
-                        <div class="w-2.5 h-2.5 rounded-full bg-slate-300 z-10"></div>
-                    </div>
-                    <div class="flex flex-col justify-between py-0.5 flex-grow">
-                        <div>
-                            <div class="text-[15px] font-bold text-slate-800">부산 (PUS) 출발</div>
-                            <div class="flex items-center gap-1.5 mt-1">
-                                <div class="bg-red-600 text-white text-[9px] font-black px-1.5 py-0.5 rounded italic tracking-wider">EASTAR</div>
-                                <span class="text-sm text-slate-600">이스타항공</span>
-                            </div>
-                            <div class="text-xs font-bold text-brand mt-1">1시간 20분 소요</div>
-                        </div>
-                        <div class="mt-auto">
-                            <div class="text-[15px] font-bold text-slate-800">구마모토 (KMJ) 도착</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="timeline-item">
-                <div class="timeline-icon"><i class="fa-solid fa-car"></i></div>
-                <h4 class="font-bold text-slate-800 text-[16px]">14:30 | 렌터카 픽업 및 출발</h4>
-                <p class="text-sm text-slate-500 mt-1.5 leading-relaxed">수속을 마치고 우리 가족의 든든한 발이 되어줄 차를 픽업합니다. 편의점에서 간식을 넉넉히 사고 본격적인 여행을 시작합니다.</p>
-            </div>
-            
-            <div class="timeline-item">
-                <div class="timeline-icon bg-point"><i class="fa-solid fa-camera"></i></div>
-                <h4 class="font-bold text-slate-800 text-[16px]">15:30 | 시라카와 수원지 산책</h4>
-                <div class="text-[11px] font-bold text-slate-500 bg-slate-100 inline-block px-2 py-1 rounded border border-slate-200 mt-2 mb-2">약 50분 국도 이동</div>
-                <p class="text-[15px] text-slate-700 font-bold mb-1.5">"자연이 빚어낸 천연 에메랄드빛 샘물"</p>
-                <p class="text-sm text-slate-500 mb-3 leading-relaxed">경사가 없는 평탄하고 청량한 숲길이라 부모님과 아이 모두 편안하게 거닐 수 있습니다.</p>
-                
-                <!-- 이미지 폴백 적용 박스 -->
-                <div class="relative w-full h-[180px] rounded-xl overflow-hidden bg-slate-100 border border-slate-200 mt-3">
-                    <img src="" alt="시라카와 수원지" class="w-full h-full object-cover absolute inset-0 z-10" onerror="this.style.display='none'">
-                    <div class="absolute inset-0 flex items-center justify-center text-slate-400 font-medium text-sm z-0">
-                        <i class="fa-regular fa-image mr-2"></i> 시라카와 수원지 풍경
-                    </div>
-                </div>
-            </div>
-
-            <div class="timeline-item">
-                <div class="timeline-icon"><i class="fa-solid fa-bed"></i></div>
-                <h4 class="font-bold text-slate-800 text-[16px]">17:00 | 카메노이 아소 호텔 도착</h4>
-                <p class="text-[15px] text-slate-700 font-bold mt-2 mb-1.5">"따뜻한 온천과 풍성한 첫날의 만찬"</p>
-                <p class="text-sm text-slate-500 mb-3 leading-relaxed">객실에 짐을 풀고 잠시 쉰 뒤, 17시 30분에 예약된 호텔 뷔페에서 가족 다 함께 맛있는 저녁 식사를 즐깁니다.</p>
-
-                <div class="relative w-full h-[180px] rounded-xl overflow-hidden bg-slate-100 border border-slate-200 mt-3">
-                    <img src="" alt="아소 호텔" class="w-full h-full object-cover absolute inset-0 z-10" onerror="this.style.display='none'">
-                    <div class="absolute inset-0 flex items-center justify-center text-slate-400 font-medium text-sm z-0">
-                        <i class="fa-regular fa-image mr-2"></i> 아소 카메노이 호텔
-                    </div>
-                </div>
-            </div>
-
-            <!-- 1일차 조/중/석/숙박 요약 -->
-            <div class="mt-6 bg-white rounded-xl border border-slate-200 shadow-sm p-4 text-center grid grid-cols-4 divide-x divide-slate-100">
-                <div class="flex flex-col items-center justify-center">
-                    <span class="text-slate-400 text-[11px] font-bold mb-1">조식</span>
-                    <span class="text-slate-700 text-sm font-medium">불포함</span>
-                </div>
-                <div class="flex flex-col items-center justify-center">
-                    <span class="text-slate-400 text-[11px] font-bold mb-1">중식</span>
-                    <span class="text-slate-700 text-sm font-medium">현지식</span>
-                </div>
-                <div class="flex flex-col items-center justify-center">
-                    <span class="text-brand text-[11px] font-bold mb-1">석식</span>
-                    <span class="text-slate-800 text-sm font-bold">호텔뷔페</span>
-                </div>
-                <div class="flex flex-col items-center justify-center">
-                    <span class="text-brand text-[11px] font-bold mb-1">숙박</span>
-                    <span class="text-slate-800 text-xs font-bold px-1">카메노이<br>아소</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- DAY 2 -->
-        <div class="mb-12">
-            <div class="flex justify-between items-end mb-5 border-b border-slate-100 pb-3">
-                <div>
-                    <div class="text-brand font-black text-sm mb-1 tracking-wider">DAY 2</div>
-                    <div class="font-bold text-xl text-slate-800">초원과 현수교, 벳푸로</div>
-                </div>
-            </div>
-            
-            <div class="timeline-item">
-                <div class="timeline-icon"><i class="fa-solid fa-mountain-sun"></i></div>
-                <h4 class="font-bold text-slate-800 text-[16px]">10:00 | 쿠사센리 초원 조망</h4>
-                <p class="text-[15px] text-slate-700 font-bold mt-2 mb-1.5">"하늘과 맞닿은 웅장한 화산 분화구"</p>
-                <p class="text-sm text-slate-500 mb-3 leading-relaxed">든든한 조식 후 아소 파노라마 라인을 타고 등반합니다. 아이가 초원에서 마음껏 뛰어놀며 멋진 가족 사진을 남깁니다.</p>
-
-                <div class="relative w-full h-[180px] rounded-xl overflow-hidden bg-slate-100 border border-slate-200 mt-3">
-                    <img src="" alt="쿠사센리" class="w-full h-full object-cover absolute inset-0 z-10" onerror="this.style.display='none'">
-                    <div class="absolute inset-0 flex items-center justify-center text-slate-400 font-medium text-sm z-0">
-                        <i class="fa-regular fa-image mr-2"></i> 광활한 쿠사센리 초원
-                    </div>
-                </div>
-            </div>
-            
-            <div class="timeline-item">
-                <div class="timeline-icon"><i class="fa-solid fa-torii-gate"></i></div>
-                <h4 class="font-bold text-slate-800 text-[16px]">11:20 | 아소 신사 및 몬젠마치 산책</h4>
-                <p class="text-[15px] text-slate-700 font-bold mt-2 mb-1.5">"아기자기한 상점가 산책과 맛있는 점심"</p>
-                <p class="text-sm text-slate-500 mb-3 leading-relaxed">유모차를 끌기 좋은 평탄한 거리를 걸으며 고로케 등 간식을 맛봅니다. 점심은 근처 식당에서 든든하게 해결합니다.</p>
-            </div>
-
-            <div class="timeline-item">
-                <div class="timeline-icon bg-point"><i class="fa-solid fa-bridge-water"></i></div>
-                <h4 class="font-bold text-slate-800 text-[16px]">14:10 | 고코노에 대현수교</h4>
-                <p class="text-[15px] text-slate-700 font-bold mt-2 mb-1.5">"허공을 걷는 듯한 아찔하고 거대한 절경"</p>
-                <p class="text-sm text-slate-500 mb-3 leading-relaxed">야마나미 하이웨이를 타고 북상하여 일본 최대급 보행 현수교를 걷습니다. 폭포 뷰가 있어 부모님들께서 особенно 좋아하십니다.</p>
-
-                <div class="relative w-full h-[180px] rounded-xl overflow-hidden bg-slate-100 border border-slate-200 mt-3">
-                    <img src="" alt="대현수교" class="w-full h-full object-cover absolute inset-0 z-10" onerror="this.style.display='none'">
-                    <div class="absolute inset-0 flex items-center justify-center text-slate-400 font-medium text-sm z-0">
-                        <i class="fa-regular fa-image mr-2"></i> 고코노에 대현수교
-                    </div>
-                </div>
-            </div>
-
-            <div class="timeline-item">
-                <div class="timeline-icon"><i class="fa-solid fa-car-side"></i></div>
-                <h4 class="font-bold text-slate-800 text-[16px]">16:00 | 벳푸 렉스 호텔 도착</h4>
-                <div class="text-[11px] font-bold text-slate-500 bg-slate-100 inline-block px-2 py-1 rounded border border-slate-200 mt-2 mb-2">약 1시간 국도 이동 (차에서 푹 쉬기 좋은 구간)</div>
-                <p class="text-[15px] text-slate-700 font-bold mb-1.5">"눈앞에 펼쳐지는 벳푸만 오션뷰"</p>
-                <p class="text-sm text-slate-500 leading-relaxed">바다 전망 객실에서 짐을 풀고 휴식합니다. 저녁엔 근처 맛집에서 쾌적하게 식사를 합니다.</p>
-            </div>
-
-            <!-- 2일차 요약 -->
-            <div class="mt-6 bg-white rounded-xl border border-slate-200 shadow-sm p-4 text-center grid grid-cols-4 divide-x divide-slate-100">
-                <div class="flex flex-col items-center justify-center">
-                    <span class="text-brand text-[11px] font-bold mb-1">조식</span>
-                    <span class="text-slate-800 text-sm font-bold">호텔식</span>
-                </div>
-                <div class="flex flex-col items-center justify-center">
-                    <span class="text-brand text-[11px] font-bold mb-1">중식</span>
-                    <span class="text-slate-800 text-sm font-bold">현지식</span>
-                </div>
-                <div class="flex flex-col items-center justify-center">
-                    <span class="text-brand text-[11px] font-bold mb-1">석식</span>
-                    <span class="text-slate-800 text-sm font-bold">현지식</span>
-                </div>
-                <div class="flex flex-col items-center justify-center">
-                    <span class="text-brand text-[11px] font-bold mb-1">석식</span>
-                    <span class="text-slate-800 text-sm font-bold">자유식</span>
-                </div>
-                <div class="flex flex-col items-center justify-center">
-                    <span class="text-brand text-[11px] font-bold mb-1">숙박</span>
-                    <span class="text-slate-800 text-[11px] font-bold px-1">렉스호텔<br>벳푸</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- DAY 3 -->
-        <div class="mb-12">
-            <div class="flex justify-between items-end mb-5 border-b border-slate-100 pb-3">
-                <div>
-                    <div class="text-brand font-black text-sm mb-1 tracking-wider">DAY 3</div>
-                    <div class="font-bold text-xl text-slate-800">모락모락 온천과 동물탐험</div>
-                </div>
-            </div>
-            
-            <div class="timeline-item">
-                <div class="timeline-icon"><i class="fa-solid fa-hot-tub-person"></i></div>
-                <h4 class="font-bold text-slate-800 text-[16px]">09:45 | 지옥온천 순례 & 점심 식사</h4>
-                <p class="text-[15px] text-slate-700 font-bold mt-2 mb-1.5">"신비로운 색깔의 온천과 족욕의 여유"</p>
-                <p class="text-sm text-slate-500 mb-3 leading-relaxed">가마도 지옥, 우미 지옥 등 1~2곳을 관람하고 따뜻한 족욕을 즐깁니다. 구경을 마친 후 바로 근처 식당에서 든든하게 점심을 먹습니다.</p>
-
-                <div class="relative w-full h-[180px] rounded-xl overflow-hidden bg-slate-100 border border-slate-200 mt-3">
-                    <img src="" alt="지옥온천" class="w-full h-full object-cover absolute inset-0 z-10" onerror="this.style.display='none'">
-                    <div class="absolute inset-0 flex items-center justify-center text-slate-400 font-medium text-sm z-0">
-                        <i class="fa-regular fa-image mr-2"></i> 지옥 온천 순례
-                    </div>
-                </div>
-            </div>
-
-            <div class="timeline-item">
-                <div class="timeline-icon bg-point"><i class="fa-solid fa-hippo"></i></div>
-                <h4 class="font-bold text-slate-800 text-[16px]">13:40 | 아프리칸 사파리</h4>
-                <p class="text-[15px] text-slate-700 font-bold mt-2 mb-1.5">"우리가족 차를 타고 들어가는 야생 정글"</p>
-                <p class="text-sm text-slate-500 mb-3 leading-relaxed">아이를 위한 최고의 하이라이트! 우리 렌터카를 직접 운전해 정글로 들어가 편안하고 안전하게 동물들을 관찰합니다.</p>
-
-                <div class="relative w-full h-[180px] rounded-xl overflow-hidden bg-slate-100 border border-slate-200 mt-3">
-                    <img src="" alt="아프리칸 사파리" class="w-full h-full object-cover absolute inset-0 z-10" onerror="this.style.display='none'">
-                    <div class="absolute inset-0 flex items-center justify-center text-slate-400 font-medium text-sm z-0">
-                        <i class="fa-regular fa-image mr-2"></i> 아프리칸 사파리 자가 진입
-                    </div>
-                </div>
-            </div>
-
-            <div class="timeline-item">
-                <div class="timeline-icon"><i class="fa-solid fa-utensils"></i></div>
-                <h4 class="font-bold text-slate-800 text-[16px]">16:30 | 호텔 복귀 및 저녁 식사</h4>
-                <p class="text-sm text-slate-500 mt-1.5 leading-relaxed">전날 방문하지 못한 벳푸 시내 맛집(토요츠네, 대형 회전초밥 등 대기가 적은 곳 위주)을 찾아 유연하게 저녁을 먹습니다.</p>
-            </div>
-
-            <!-- 3일차 요약 -->
-            <div class="mt-6 bg-white rounded-xl border border-slate-200 shadow-sm p-4 text-center grid grid-cols-4 divide-x divide-slate-100">
-                <div class="flex flex-col items-center justify-center">
-                    <span class="text-brand text-[11px] font-bold mb-1">조식</span>
-                    <span class="text-slate-800 text-sm font-bold">호텔식</span>
-                </div>
-                <div class="flex flex-col items-center justify-center">
-                    <span class="text-brand text-[11px] font-bold mb-1">중식</span>
-                    <span class="text-slate-800 text-sm font-bold">현지식</span>
-                </div>
-                <div class="flex flex-col items-center justify-center">
-                    <span class="text-brand text-[11px] font-bold mb-1">석식</span>
-                    <span class="text-slate-800 text-sm font-bold">현지식</span>
-                </div>
-                <div class="flex flex-col items-center justify-center">
-                    <span class="text-brand text-[11px] font-bold mb-1">석식</span>
-                    <span class="text-slate-800 text-sm font-bold">자유식</span>
-                </div>
-                <div class="flex flex-col items-center justify-center">
-                    <span class="text-brand text-[11px] font-bold mb-1">숙박</span>
-                    <span class="text-slate-800 text-[11px] font-bold px-1">렉스호텔<br>벳푸</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- DAY 4 -->
-        <div class="mb-12">
-            <div class="flex justify-between items-end mb-5 border-b border-slate-100 pb-3">
-                <div>
-                    <div class="text-brand font-black text-sm mb-1 tracking-wider">DAY 4</div>
-                    <div class="font-bold text-xl text-slate-800">감성 마을과 인생 드라이브</div>
-                </div>
-            </div>
-            
-            <div class="timeline-item">
-                <div class="timeline-icon"><i class="fa-solid fa-shop"></i></div>
-                <h4 class="font-bold text-slate-800 text-[16px]">09:40 | 유후인 산책 및 점심</h4>
-                <p class="text-[15px] text-slate-700 font-bold mt-2 mb-1.5">"물안개 피어오르는 동화 속 아기자기한 마을"</p>
-                <p class="text-sm text-slate-500 mb-3 leading-relaxed">긴린코 호수와 유노츠보 거리를 거닐며 감성을 느낍니다. 점심은 닭구이나 우동 등 가족 모두 먹기 좋은 메뉴를 고릅니다.</p>
-
-                <div class="relative w-full h-[180px] rounded-xl overflow-hidden bg-slate-100 border border-slate-200 mt-3">
-                    <img src="" alt="유후인" class="w-full h-full object-cover absolute inset-0 z-10" onerror="this.style.display='none'">
-                    <div class="absolute inset-0 flex items-center justify-center text-slate-400 font-medium text-sm z-0">
-                        <i class="fa-regular fa-image mr-2"></i> 유후인 긴린코 호수
-                    </div>
-                </div>
-            </div>
-
-            <div class="timeline-item">
-                <div class="timeline-icon bg-point"><i class="fa-solid fa-road"></i></div>
-                <h4 class="font-bold text-slate-800 text-[16px]">13:40 | 다이칸보 전망대</h4>
-                <p class="text-[15px] text-slate-700 font-bold mt-2 mb-1.5">"가슴 탁 트이는 아소 외륜산의 파노라마"</p>
-                <p class="text-sm text-slate-500 mb-3 leading-relaxed">일본 최고의 드라이브 코스 '야마나미 하이웨이'를 시원하게 달립니다. 광활한 대자연을 배경으로 인생 사진을 남겨보세요.</p>
-
-                <div class="relative w-full h-[180px] rounded-xl overflow-hidden bg-slate-100 border border-slate-200 mt-3">
-                    <img src="" alt="다이칸보" class="w-full h-full object-cover absolute inset-0 z-10" onerror="this.style.display='none'">
-                    <div class="absolute inset-0 flex items-center justify-center text-slate-400 font-medium text-sm z-0">
-                        <i class="fa-regular fa-image mr-2"></i> 탁 트인 다이칸보
-                    </div>
-                </div>
-            </div>
-
-            <div class="timeline-item">
-                <div class="timeline-icon"><i class="fa-solid fa-city"></i></div>
-                <h4 class="font-bold text-slate-800 text-[16px]">15:50 | 구마모토 시내 도착</h4>
-                <div class="text-[11px] font-bold text-slate-500 bg-slate-100 inline-block px-2 py-1 rounded border border-slate-200 mt-2 mb-2">약 1시간 30분 장거리 이동</div>
-                <p class="text-[15px] text-slate-700 font-bold mb-1.5">"모던하고 쾌적한 도심 속 편안한 밤"</p>
-                <p class="text-sm text-slate-500 leading-relaxed">ref 베셀 구마모토에 짐을 풀고 시청 무료 전망대에서 야경을 구경한 뒤, 카츠레츠테이 등에서 저녁을 먹습니다.</p>
-            </div>
-
-            <!-- 4일차 요약 -->
-            <div class="mt-6 bg-white rounded-xl border border-slate-200 shadow-sm p-4 text-center grid grid-cols-4 divide-x divide-slate-100">
-                <div class="flex flex-col items-center justify-center">
-                    <span class="text-brand text-[11px] font-bold mb-1">조식</span>
-                    <span class="text-slate-800 text-sm font-bold">호텔식</span>
-                </div>
-                <div class="flex flex-col items-center justify-center">
-                    <span class="text-brand text-[11px] font-bold mb-1">중식</span>
-                    <span class="text-slate-800 text-sm font-bold">현지식</span>
-                </div>
-                <div class="flex flex-col items-center justify-center">
-                    <span class="text-brand text-[11px] font-bold mb-1">석식</span>
-                    <span class="text-slate-800 text-sm font-bold">현지식</span>
-                </div>
-                <div class="flex flex-col items-center justify-center">
-                    <span class="text-brand text-[11px] font-bold mb-1">석식</span>
-                    <span class="text-slate-800 text-sm font-bold">자유식</span>
-                </div>
-                <div class="flex flex-col items-center justify-center">
-                    <span class="text-brand text-[11px] font-bold mb-1">숙박</span>
-                    <span class="text-slate-800 text-[11px] font-bold px-1">ref 베셀<br>구마모토</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- DAY 5 -->
-        <div class="mb-5">
-            <div class="flex justify-between items-end mb-5 border-b border-slate-100 pb-3">
-                <div>
-                    <div class="text-brand font-black text-sm mb-1 tracking-wider">DAY 5</div>
-                    <div class="font-bold text-xl text-slate-800">아쉬움을 뒤로하고 귀국길</div>
-                </div>
-            </div>
-
-            <!-- 항공 UI (5일차) -->
-            <div class="bg-white rounded-xl border border-slate-200 p-4 mb-6 shadow-sm">
-                <div class="flex items-stretch gap-4">
-                    <div class="flex flex-col justify-between text-right w-16 flex-shrink-0">
-                        <div>
-                            <div class="text-lg font-black text-slate-800 leading-none">14:50</div>
-                            <div class="text-[11px] text-slate-400 mt-1">05/19(화)</div>
-                        </div>
-                        <div class="py-3"></div>
-                        <div>
-                            <div class="text-lg font-black text-slate-800 leading-none">15:55</div>
-                            <div class="text-[11px] text-slate-400 mt-1">05/19(화)</div>
-                        </div>
-                    </div>
-                    <div class="flex flex-col items-center py-1 relative">
-                        <div class="w-2.5 h-2.5 rounded-full bg-slate-300 z-10"></div>
-                        <div class="w-0.5 bg-slate-200 flex-grow my-1"></div>
-                        <div class="w-2.5 h-2.5 rounded-full bg-slate-300 z-10"></div>
-                    </div>
-                    <div class="flex flex-col justify-between py-0.5 flex-grow">
-                        <div>
-                            <div class="text-[15px] font-bold text-slate-800">구마모토 (KMJ) 출발</div>
-                            <div class="flex items-center gap-1.5 mt-1">
-                                <div class="bg-red-600 text-white text-[9px] font-black px-1.5 py-0.5 rounded italic tracking-wider">EASTAR</div>
-                                <span class="text-sm text-slate-600">이스타항공</span>
-                            </div>
-                            <div class="text-xs font-bold text-brand mt-1">1시간 5분 소요</div>
-                        </div>
-                        <div class="mt-auto">
-                            <div class="text-[15px] font-bold text-slate-800">부산 (PUS) 도착</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="timeline-item">
-                <div class="timeline-icon"><i class="fa-brands fa-pagelines"></i></div>
-                <h4 class="font-bold text-slate-800 text-[16px]">09:50 | 스이젠지 조주엔 정원</h4>
-                <p class="text-[15px] text-slate-700 font-bold mt-2 mb-1.5">"도심 속 평온한 에도 시대 다이묘 정원"</p>
-                <p class="text-sm text-slate-500 mb-3 leading-relaxed">평탄하고 아름다운 일본식 정원을 여유롭게 산책하며 3대 가족의 단체 사진을 남깁니다.</p>
-
-                <div class="relative w-full h-[180px] rounded-xl overflow-hidden bg-slate-100 border border-slate-200 mt-3">
-                    <img src="" alt="스이젠지" class="w-full h-full object-cover absolute inset-0 z-10" onerror="this.style.display='none'">
-                    <div class="absolute inset-0 flex items-center justify-center text-slate-400 font-medium text-sm z-0">
-                        <i class="fa-regular fa-image mr-2"></i> 아름다운 스이젠지 조주엔
-                    </div>
-                </div>
-            </div>
-
-            <div class="timeline-item">
-                <div class="timeline-icon bg-point"><i class="fa-solid fa-plane-arrival"></i></div>
-                <h4 class="font-bold text-slate-800 text-[16px]">12:50 | 렌터카 반납 및 귀국</h4>
-                <p class="text-sm text-slate-500 mt-1.5 leading-relaxed">시내에서 든든하게 점심 식사를 마친 후 여유롭게 공항으로 이동합니다. 렌터카를 반납하고 귀국 수속을 밟습니다.</p>
-            </div>
-
-            <!-- 5일차 요약 -->
-            <div class="mt-6 bg-white rounded-xl border border-slate-200 shadow-sm p-4 text-center grid grid-cols-4 divide-x divide-slate-100">
-                <div class="flex flex-col items-center justify-center">
-                    <span class="text-brand text-[11px] font-bold mb-1">조식</span>
-                    <span class="text-slate-800 text-sm font-bold">호텔식</span>
-                </div>
-                <div class="flex flex-col items-center justify-center">
-                    <span class="text-brand text-[11px] font-bold mb-1">중식</span>
-                    <span class="text-slate-800 text-sm font-bold">현지식</span>
-                </div>
-                <div class="flex flex-col items-center justify-center">
-                    <span class="text-slate-400 text-[11px] font-bold mb-1">석식</span>
-                    <span class="text-slate-700 text-sm font-medium">불포함</span>
-                </div>
-                <div class="flex flex-col items-center justify-center">
-                    <span class="text-slate-400 text-[11px] font-bold mb-1">숙박</span>
-                    <span class="text-slate-800 text-sm font-bold">집 🏠</span>
-                </div>
-            </div>
-        </div>
-    </div>
-
-
-    <!-- ==================== VIEW 2: 상세 경비 ==================== -->
-    <div id="view-budget" class="tab-content p-6 bg-slate-50">
-        
-        <!-- 총액 카드 -->
-        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-6 text-center relative overflow-hidden">
-            <div class="absolute top-0 left-0 w-full h-1.5 bg-brand"></div>
-            <h3 class="text-[15px] font-bold text-slate-600 mb-1">우리 가족 총 예상 경비</h3>
-            <p class="text-xs text-slate-400 mb-3">(성인 4인 + 만 4세 1인 기준)</p>
-            <p class="text-3xl font-black text-slate-800 mb-2">약 4,890,000<span class="text-lg">원</span></p>
-            <p class="text-xs text-brand font-medium bg-emerald-50 py-1.5 px-3 rounded-md inline-block">
-                <i class="fa-solid fa-check mr-1"></i> 환율 100엔 930원 가정
-            </p>
-        </div>
-
-        <!-- 도넛 차트 섹션 -->
-        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 mb-6">
-            <h3 class="font-bold text-[15px] text-slate-700 mb-4 text-center">예산 구성 비율</h3>
-            <div class="relative w-full max-w-[240px] mx-auto mb-2">
-                <canvas id="budgetChart"></canvas>
-            </div>
-        </div>
-
-        <h3 class="font-bold text-lg mb-4 mt-8 flex items-center gap-2 text-slate-800 border-b border-slate-200 pb-2">
-            <i class="fa-solid fa-list-check text-brand"></i> 결제 및 체재비 상세
-        </h3>
-
-        <!-- 1. 사전 결제 -->
-        <div class="bg-white rounded-xl shadow-sm border border-slate-200 mb-4">
-            <div class="px-5 py-3.5 bg-slate-100/50 border-b border-slate-200 flex justify-between items-center">
-                <span class="font-bold text-slate-700">1. 사전 결제 (한국 지불완료)</span>
-                <span class="text-brand font-bold text-[15px]">2,516,000 원</span>
-            </div>
-            <div class="px-5 py-4 text-sm space-y-3">
-                <div class="flex justify-between items-center">
-                    <span class="text-slate-600">이스타항공 왕복 (5인)</span>
-                    <span class="font-medium text-slate-800">1,206,000 원</span>
-                </div>
-                <div class="flex justify-between items-center">
-                    <span class="text-slate-600">벳푸 렉스 호텔 (2박/조식)</span>
-                    <span class="font-medium text-slate-800">1,002,000 원</span>
-                </div>
-                <div class="flex justify-between items-center">
-                    <span class="text-slate-600">구마모토 베셀 호텔 (1박/조식)</span>
-                    <span class="font-medium text-slate-800">308,000 원</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- 2. 현지 고정비 -->
-        <div class="bg-white rounded-xl shadow-sm border border-slate-200 mb-4">
-            <div class="px-5 py-3.5 bg-slate-100/50 border-b border-slate-200 flex justify-between items-center">
-                <span class="font-bold text-slate-700">2. 현지 고정 지출 (확정분)</span>
-                <span class="text-brand font-bold text-[15px]">1,169,679 원</span>
-            </div>
-            <div class="px-5 py-4 text-sm space-y-3">
-                <div class="flex justify-between items-center">
-                    <span class="text-slate-600">카메노이 아소 (1박/조석식)</span>
-                    <div class="text-right">
-                        <span class="font-medium text-slate-800">약 598,845 원</span>
-                        <span class="text-xs text-slate-400 block mt-0.5">(64,392 엔)</span>
-                    </div>
-                </div>
-                <div class="flex justify-between items-center">
-                    <span class="text-slate-600">토요타 렌터카 (복시/노아)</span>
-                    <div class="text-right">
-                        <span class="font-medium text-slate-800">약 570,834 원</span>
-                        <span class="text-xs text-slate-400 block mt-0.5">(61,380 엔)</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- 3. 식비 및 체재비 -->
-        <div class="bg-white rounded-xl shadow-sm border border-slate-200 mb-4">
-            <div class="px-5 py-3.5 bg-slate-100/50 border-b border-slate-200 flex justify-between items-center">
-                <span class="font-bold text-slate-700">3. 식비 및 교통 체재비</span>
-                <span class="text-brand font-bold text-[15px]">1,023,000 원</span>
-            </div>
-            <div class="px-5 py-4 text-sm space-y-3">
-                <div class="bg-orange-50 text-point text-xs p-2.5 rounded mb-3 font-medium text-center">총 넉넉한 예산: 110,000 엔</div>
-                <div class="flex justify-between items-center">
-                    <span class="text-slate-600">가족 식대 (중식/석식)</span>
-                    <span class="font-medium text-slate-800">80,000 엔</span>
-                </div>
-                <div class="flex justify-between items-center">
-                    <span class="text-slate-600">간식/커피/편의점 등</span>
-                    <span class="font-medium text-slate-800">20,000 엔</span>
-                </div>
-                <div class="flex justify-between items-center">
-                    <span class="text-slate-600">주유비 (여유있게 배정)</span>
-                    <span class="font-medium text-slate-800">8,000 엔</span>
-                </div>
-                <div class="flex justify-between items-center">
-                    <span class="text-slate-600">공영/유료 주차비용</span>
-                    <span class="font-medium text-slate-800">2,000 엔</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- 4. 입장료 -->
-        <div class="bg-white rounded-xl shadow-sm border border-slate-200 mb-4">
-            <div class="px-5 py-3.5 bg-slate-100/50 border-b border-slate-200 flex justify-between items-center">
-                <span class="font-bold text-slate-700">4. 관광지 입장료</span>
-                <span class="text-brand font-bold text-[15px]">181,350 원</span>
-            </div>
-            <div class="px-5 py-4 text-sm space-y-3">
-                <div class="bg-orange-50 text-point text-xs p-2.5 rounded mb-3 font-medium text-center">총 실비 계산: 19,500 엔</div>
-                <div class="flex justify-between items-center">
-                    <span class="text-slate-600">아프리칸 사파리 (성인4/소인1)</span>
-                    <span class="font-medium text-slate-800">11,900 엔</span>
-                </div>
-                <div class="flex justify-between items-center">
-                    <span class="text-slate-600">지옥온천 (2곳 x 성인4)</span>
-                    <span class="font-medium text-slate-800">3,600 엔</span>
-                </div>
-                <div class="flex justify-between items-center">
-                    <span class="text-slate-600">고코노에 대현수교 (성인4)</span>
-                    <span class="font-medium text-slate-800">2,000 엔</span>
-                </div>
-                <div class="flex justify-between items-center">
-                    <span class="text-slate-600">스이젠지 조주엔 (성인4)</span>
-                    <span class="font-medium text-slate-800">1,600 엔</span>
-                </div>
-                <div class="flex justify-between items-center">
-                    <span class="text-slate-600">시라카와 수원지 (성인4)</span>
-                    <span class="font-medium text-slate-800">400 엔</span>
-                </div>
-            </div>
-        </div>
-        
-        <div class="pb-6"></div>
-
-    </div>
-
+<div class="hero">
+  <div class="hero-rings"></div>
+  <div class="hero-badge">🚗 &nbsp;3대 가족 프리미엄 기획 · 4박 5일</div>
+  <div class="hero-sub">Family Road Trip in Kyushu</div>
+  <h1 class="hero-title">5월의 규슈,<br>대자연을 달리다</h1>
+  <div class="hero-route">
+    <span class="hero-pill">아소</span><span class="hero-arr">›</span>
+    <span class="hero-pill">벳푸</span><span class="hero-arr">›</span>
+    <span class="hero-pill">유후인</span><span class="hero-arr">›</span>
+    <span class="hero-pill">구마모토</span>
+  </div>
 </div>
 
+<!-- ── TRIP INFO ───────────────────────────────── -->
+
+<div class="trip-info">
+  <div class="ti-item">
+    <div class="ti-icon">✈️</div>
+    <div class="ti-lbl">일정</div>
+    <div class="ti-val">5.15 — 5.19</div>
+  </div>
+  <div class="ti-item">
+    <div class="ti-icon">🌙</div>
+    <div class="ti-lbl">숙박</div>
+    <div class="ti-val">4박 5일</div>
+  </div>
+  <div class="ti-item">
+    <div class="ti-icon">👨‍👩‍👧</div>
+    <div class="ti-lbl">인원</div>
+    <div class="ti-val">3대 5인</div>
+  </div>
+  <div class="ti-item">
+    <div class="ti-icon">💴</div>
+    <div class="ti-lbl">예산</div>
+    <div class="ti-val">약 500만</div>
+  </div>
+</div>
+
+<!-- ── STICKY TABS ────────────────────────────── -->
+
+<div class="sticky-nav">
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('sched',this)">📋 상세 일정</button>
+    <button class="tab-btn" onclick="switchTab('budget',this)">💴 여행 예산</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     VIEW 1 — 일정표
+══════════════════════════════════════════════ -->
+
+<div id="view-sched" class="tab-view active">
+
+<!-- ─── DAY 1 ─── -->
+
+<div class="day-sec">
+  <div class="day-badge"><span class="day-num">DAY 1</span><span class="day-date">5월 15일 (금)</span></div>
+  <div class="day-title">설레는 첫 발걸음</div>
+  <div class="day-sub">신아소대교 전망 → 센스이쿄 → 카메노이 아소 호텔</div>
+</div>
+
+<div class="flight-card">
+  <div class="fc-times">
+    <div><div class="fc-time">12:30</div><div class="fc-city">부산 PUS</div></div>
+    <div><div class="fc-time">13:50</div><div class="fc-city">구마모토 KMJ</div></div>
+  </div>
+  <div class="fc-line">
+    <div class="fc-dot"></div>
+    <div class="fc-stem"><div class="fc-plane">✈</div></div>
+    <div class="fc-dot arr"></div>
+  </div>
+  <div class="fc-info">
+    <div>
+      <div class="fc-from">부산 출발</div>
+      <div class="fc-airline"><span class="fc-badge">EASTAR</span><span class="fc-fnum">ZE967</span></div>
+      <div class="fc-dur">⏱ 1시간 20분</div>
+    </div>
+    <div class="fc-to">구마모토 도착</div>
+  </div>
+</div>
+
+<div class="scene-card">
+  <div class="scene-art art-renew">
+    <div class="scene-art-emoji">🚗</div>
+    <div style="position:relative;z-index:2">
+      <div class="scene-art-label">Toyota Rental Car · KMJ Airport</div>
+      <div class="scene-art-title">렌터카 픽업 & 출발</div>
+    </div>
+  </div>
+  <div class="scene-body">
+    <div class="time-row">
+      <span class="tr-arr">14:30</span>
+      <span class="tr-move">🏢 공항 렌터카 영업소</span>
+    </div>
+    <div class="scene-head">토요타 노아/복시 수령 후 첫 목적지로 출발</div>
+    <p class="desc-short">카운터 수속 후 셔틀로 영업소 이동까지 약 30분 소요. 공항 인근 편의점에서 간식을 보급한 뒤 출발합니다.</p>
+    <div class="desc-full" id="d1a">
+      <div class="warn-box">⚠️ 일본은 <strong>좌측통행 · 우핸들</strong><br>깜빡이와 와이퍼 레버 위치가 반대입니다. 국제운전면허증 + 한국 운전면허증 두 가지 모두 지참 필수.</div>
+    </div>
+    <button class="toggle-btn" onclick="tgl('d1a',this)"><span class="tgl-icon">▼</span> 더 보기</button>
+  </div>
+</div>
+
+<div class="scene-card">
+  <div class="scene-art art-bridge-new">
+    <div class="scene-art-bg" style="background-image:url('https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Shin_Aso_Ohashi_Bridge.jpg/800px-Shin_Aso_Ohashi_Bridge.jpg')" onerror="this.style.display='none'"></div>
+    <div class="scene-art-overlay"></div>
+    <div class="scene-art-emoji">🌉</div>
+    <div style="position:relative;z-index:2">
+      <div class="scene-art-label">Shin-Aso Ohashi · Minami-Aso</div>
+      <div class="scene-art-title">신아소대교 전망대</div>
+    </div>
+  </div>
+  <div class="scene-body">
+    <div class="time-row">
+      <span class="tr-move">🚗 국도 35분 이동</span>
+      <span class="tr-arr">15:05 도착</span>
+      <span class="tr-stay">⏱ 약 20분 체류</span>
+    </div>
+    <div class="scene-head">2016년 지진으로 붕괴된 구교와 2021년 완공된 신교를 함께 조망</div>
+    <div class="scene-tagline">전장 525m · 재건의 상징 · 협곡과 아소 외륜산 파노라마</div>
+    <p class="desc-short">구마모토 지진 최대 피해 현장이었던 아소 대교 붕괴지에 새롭게 완공된 교량. 전망대에서 협곡 아래로 내려다보이는 아이노카와 강 뷰가 인상적입니다.</p>
+    <div class="desc-full" id="d1b">
+      <p>2016년 구마모토 지진(M7.3)으로 기존 아소대교가 붕괴되면서 대규모 산사태가 발생한 현장입니다. 5년 만에 전장 525m의 신아소대교가 완공되어 2021년 개통하였습니다. 전망대에서는 신교와 함께 그 아래 붕괴된 구교 교각 일부를 교훈의 흔적으로 확인할 수 있습니다. 협곡을 가로지르는 높이감이 상당하며, 아소 외륜산을 배경으로 한 구도가 사진 스팟으로 인기입니다.</p>
+      <div class="tip-box">💡 전망대 주차장이 협소할 수 있으니 평일 오후 시간대인 지금 타이밍은 비교적 여유롭습니다.</div>
+    </div>
+    <button class="toggle-btn" onclick="tgl('d1b',this)"><span class="tgl-icon">▼</span> 더 보기</button>
+  </div>
+</div>
+
+<div class="scene-card">
+  <div class="scene-art art-gorge">
+    <div class="scene-art-bg" style="background-image:url('https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Sensui_gorge_Aso.jpg/800px-Sensui_gorge_Aso.jpg')" onerror="this.style.display='none'"></div>
+    <div class="scene-art-overlay"></div>
+    <div class="scene-art-emoji">🌿</div>
+    <div style="position:relative;z-index:2">
+      <div class="scene-art-label">Sensui-kyo Gorge · Aso</div>
+      <div class="scene-art-title">센스이쿄 협곡</div>
+    </div>
+  </div>
+  <div class="scene-body">
+    <div class="time-row">
+      <span class="tr-move">🚗 15분 이동</span>
+      <span class="tr-arr">15:40 도착</span>
+      <span class="tr-stay">⏱ 약 55분 체류</span>
+    </div>
+    <div class="scene-head">나카다케 북사면 수직 협곡 — 주차장 주변 계곡과 전망대</div>
+    <div class="scene-tagline">현무암 주상절리 · 5월 미야마키리시마 철쭉 (개화 현황 사전 확인)</div>
+    <p class="desc-short">주차장에서 계곡 초입과 전망 포인트까지만 관람합니다. 협곡 아래로 내려가는 돌계단 구간은 생략.</p>
+    <div class="desc-full" id="d1c">
+      <p>아소산 나카다케 북쪽 사면을 타고 흘러내린 용암이 만든 현무암 주상절리 협곡입니다. 전망대에서 협곡 전체를 한눈에 내려다볼 수 있습니다. 5월 초~중순에는 미야마키리시마(깊은 산 철쭉)가 협곡 사면을 분홍빛으로 물들이는 장관이 펼쳐지지만, 5월 15일은 해에 따라 막바지이거나 끝난 시기일 수 있습니다.</p>
+    </div>
+    <button class="toggle-btn" onclick="tgl('d1c',this)"><span class="tgl-icon">▼</span> 더 보기</button>
+  </div>
+</div>
+
+<div class="scene-card">
+  <div class="scene-art art-kusa" style="height:90px">
+    <div class="scene-art-emoji">🏨</div>
+    <div style="position:relative;z-index:2">
+      <div class="scene-art-label">Kamenoi Hotel Aso</div>
+      <div class="scene-art-title">카메노이 아소 호텔 체크인</div>
+    </div>
+  </div>
+  <div class="scene-body">
+    <div class="time-row">
+      <span class="tr-move">🚗 20분 이동</span>
+      <span class="tr-arr">16:55 도착</span>
+    </div>
+    <div class="scene-head">조식 · 석식 포함 · 천연 온천</div>
+    <p class="desc-short">뷔페 석식 17:45 시작. 식사 후 호텔 온천에서 여독을 풉니다.</p>
+  </div>
+</div>
+
+<div class="meal-row">
+  <div class="meal-cell"><div class="m-lbl">조식</div><div class="m-val">집에서</div></div>
+  <div class="meal-cell"><div class="m-lbl">중식</div><div class="m-val">공항에서</div></div>
+  <div class="meal-cell"><div class="m-lbl">석식</div><div class="m-val inc">호텔뷔페 ✓</div></div>
+  <div class="meal-cell"><div class="m-lbl">숙박</div><div class="m-val inc">카메노이<br>아소 ✓</div></div>
+</div>
+<div class="day-divider"></div>
+
+<!-- ─── DAY 2 ─── -->
+
+<div class="day-sec">
+  <div class="day-badge"><span class="day-num">DAY 2</span><span class="day-date">5월 16일 (토)</span></div>
+  <div class="day-title">초원과 현수교, 벳푸 입성</div>
+  <div class="day-sub">쿠사센리 → 아소신사 → 고코노에 현수교 → 벳푸</div>
+</div>
+
+<div class="scene-card">
+  <div class="scene-art art-kusa">
+    <div class="scene-art-bg" style="background-image:url('https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/Kusasenri-ga-hama_Aso_2009.jpg/800px-Kusasenri-ga-hama_Aso_2009.jpg')" onerror="this.style.display='none'"></div>
+    <div class="scene-art-overlay"></div>
+    <div class="scene-art-emoji">🌿</div>
+    <div style="position:relative;z-index:2">
+      <div class="scene-art-label">Kusasenri · Aso Panorama Line</div>
+      <div class="scene-art-title">쿠사센리 초원</div>
+    </div>
+  </div>
+  <div class="scene-body">
+    <div class="time-row">
+      <span class="tr-move">🚗 파노라마 라인 25분 이동</span>
+      <span class="tr-arr">10:00 도착</span>
+      <span class="tr-stay">⏱ 약 45분 체류</span>
+    </div>
+    <div class="scene-head">하늘과 맞닿은 화산 분화구 속 광활한 초원</div>
+    <div class="scene-tagline">직경 1km 원형 분화구 터 · 방목 야생마와 소 · 5월 신록 절정</div>
+    <p class="desc-short">나카다케 화구 서쪽에 형성된 초원. 5월은 신록이 가장 아름다운 시기로 방목된 야생마와 소들을 가까이 볼 수 있습니다.</p>
+    <div class="desc-full" id="d2a">
+      <p>'풀이 천 리처럼 이어진다'는 뜻으로, 드넓은 초록빛 초원이 펼쳐집니다. 인근 아소 화산박물관에서 분화 영상도 관람 가능합니다.</p>
+      <div class="warn-box">⚠️ 현재 아소 화구 구역은 헬기 사고 관련 접근 통제 중. 쿠사센리 초원 구역 진입 가능 여부 출발 전 확인 필요. 통제 시 대안: 아소 화산박물관(실내 전시)</div>
+    </div>
+    <button class="toggle-btn" onclick="tgl('d2a',this)"><span class="tgl-icon">▼</span> 더 보기</button>
+  </div>
+</div>
+
+<div class="scene-card">
+  <div class="scene-art art-jinja">
+    <div class="scene-art-emoji">⛩️</div>
+    <div style="position:relative;z-index:2">
+      <div class="scene-art-label">Aso Shrine · Monzenmaachi</div>
+      <div class="scene-art-title">아소 신사 & 몬젠마치</div>
+    </div>
+  </div>
+  <div class="scene-body">
+    <div class="time-row">
+      <span class="tr-move">🚗 35분 이동</span>
+      <span class="tr-arr">11:20 도착</span>
+      <span class="tr-stay">⏱ 약 2시간 체류 (신사+점심)</span>
+    </div>
+    <div class="scene-head">2,000년 역사의 신사 + 상점가 산책 + 점심</div>
+    <p class="desc-short">전국 약 500개 아소 계열 신사의 총본궁. 신사 앞 몬젠마치 상점가에서 아소 우유 소프트아이스크림, 아카우시 고로케 등을 즐길 수 있습니다.</p>
+    <div class="desc-full" id="d2b">
+      <p>2016년 구마모토 지진으로 누문이 붕괴되어 현재 복구 진행 중입니다. 복구 현장 자체도 역사의 현장으로 의미가 있습니다. 몬젠마치 상점가는 테이크아웃 중심이라 산책하며 먹기 좋습니다.</p>
+      <div class="food-sec">
+        <div class="food-lbl">🍽️ 점심 후보</div>
+        <div class="chips">
+          <span class="chip main">⭐ 아카우시동 야마노사토</span>
+          <span class="chip">아소 다이치 레스토랑</span>
+          <span class="chip">신사 앞 고로케 + 소프트아이스크림</span>
+        </div>
+      </div>
+    </div>
+    <button class="toggle-btn" onclick="tgl('d2b',this)"><span class="tgl-icon">▼</span> 더 보기</button>
+  </div>
+</div>
+
+<div class="scene-card">
+  <div class="scene-art art-hbridge">
+    <div class="scene-art-bg" style="background-image:url('https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Kokonoe_Yume_Suspension_Bridge.jpg/800px-Kokonoe_Yume_Suspension_Bridge.jpg')" onerror="this.style.display='none'"></div>
+    <div class="scene-art-overlay"></div>
+    <div class="scene-art-emoji">🌉</div>
+    <div style="position:relative;z-index:2">
+      <div class="scene-art-label">Kokonoe Yume Suspension Bridge</div>
+      <div class="scene-art-title">고코노에 대현수교</div>
+    </div>
+  </div>
+  <div class="scene-body">
+    <div class="time-row">
+      <span class="tr-move">🚗 국도 70분 이동</span>
+      <span class="tr-arr">14:25 도착</span>
+      <span class="tr-stay">⏱ 약 50분 체류</span>
+    </div>
+    <div class="scene-head">허공 173m 위를 걷는 일본 최장 보행 현수교</div>
+    <div class="scene-tagline">길이 390m · 높이 173m · 발아래 니나이노타키 쌍폭포</div>
+    <p class="desc-short">2006년 개통. 다리 위에서 협곡으로 쏟아지는 폭포 2줄기를 내려다봅니다. 왕복 약 40분 소요.</p>
+    <div class="desc-full" id="d2c">
+      <p>철망 발판을 통해 173m 아래 계곡이 그대로 보입니다. 출렁이는 다리에서 느끼는 높이감이 상당합니다. 탐방 후 매점에서 고코노에 소프트아이스크림 추천.</p>
+      <div class="info-list">
+        <div class="info-row"><span>입장료 성인</span><span>500엔</span></div>
+        <div class="info-row"><span>입장료 초·중학생</span><span>200엔</span></div>
+        <div class="info-row"><span>왕복 소요시간</span><span>약 40분</span></div>
+      </div>
+    </div>
+    <button class="toggle-btn" onclick="tgl('d2c',this)"><span class="tgl-icon">▼</span> 더 보기</button>
+  </div>
+</div>
+
+<div class="scene-card">
+  <div class="scene-art art-beppu" style="height:90px">
+    <div class="scene-art-emoji">🌊</div>
+    <div style="position:relative;z-index:2">
+      <div class="scene-art-label">Rex Hotel Beppu · Ocean View</div>
+      <div class="scene-art-title">렉스 호텔 벳푸 체크인</div>
+    </div>
+  </div>
+  <div class="scene-body">
+    <div class="time-row">
+      <span class="tr-move">🚗 국도 90분 이동</span>
+      <span class="tr-arr">16:45 도착</span>
+    </div>
+    <div class="scene-head">벳푸만 오션뷰 · 조식 포함 2박</div>
+    <p class="desc-short">호텔 도보 10분 이내 맛집 밀집 지역. 저녁 식사 후 호텔 온천 이용 가능.</p>
+    <div class="desc-full" id="d2d">
+      <div class="food-sec" style="border-top:none;padding-top:0;margin-top:0">
+        <div class="food-lbl">🍽️ 저녁 후보</div>
+        <div class="chips">
+          <span class="chip main">⭐ 토요츠네 본점 (텐동)</span>
+          <span class="chip">스이텐 스시</span>
+          <span class="chip">야키니쿠 간소우</span>
+          <span class="chip note">💡 토요츠네는 오픈 전 웨이팅 있음, 일찍 출발 권장</span>
+        </div>
+      </div>
+    </div>
+    <button class="toggle-btn" onclick="tgl('d2d',this)"><span class="tgl-icon">▼</span> 더 보기</button>
+  </div>
+</div>
+
+<div class="meal-row">
+  <div class="meal-cell"><div class="m-lbl">조식</div><div class="m-val inc">호텔식 ✓</div></div>
+  <div class="meal-cell"><div class="m-lbl">중식</div><div class="m-val">현지식</div></div>
+  <div class="meal-cell"><div class="m-lbl">석식</div><div class="m-val">현지식</div></div>
+  <div class="meal-cell"><div class="m-lbl">숙박</div><div class="m-val inc">렉스호텔<br>벳푸 ✓</div></div>
+</div>
+<div class="day-divider"></div>
+
+<!-- ─── DAY 3 ─── -->
+
+<div class="day-sec">
+  <div class="day-badge"><span class="day-num">DAY 3</span><span class="day-date">5월 17일 (일)</span></div>
+  <div class="day-title">지옥 온천 & 사파리 탐험</div>
+  <div class="day-sub">지옥 온천 순례 → 점심 → 아프리칸 사파리</div>
+</div>
+
+<div class="scene-card">
+  <div class="scene-art art-jigoku">
+    <div class="scene-art-bg" style="background-image:url('https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Beppu_Umi_jigoku01.jpg/800px-Beppu_Umi_jigoku01.jpg')" onerror="this.style.display='none'"></div>
+    <div class="scene-art-overlay"></div>
+    <div class="scene-art-emoji">♨️</div>
+    <div style="position:relative;z-index:2">
+      <div class="scene-art-label">Beppu Jigoku Meguri</div>
+      <div class="scene-art-title">벳푸 지옥 온천 순례</div>
+    </div>
+  </div>
+  <div class="scene-body">
+    <div class="time-row">
+      <span class="tr-move">🚗 20분 이동</span>
+      <span class="tr-arr">09:45 도착</span>
+      <span class="tr-stay">⏱ 약 2시간 45분 체류 (온천+점심)</span>
+    </div>
+    <div class="scene-head">코발트블루·선홍빛 유황 연기 — 살아있는 대지의 숨결</div>
+    <div class="scene-tagline">우미 지옥 + 가마도 지옥 추천 2곳 · 족욕 체험 가능</div>
+    <p class="desc-short">실제 입욕은 불가하지만 뜨거운 온천수가 자연적으로 솟구치는 경관을 관람합니다. 족욕장이 마련된 곳도 있습니다.</p>
+    <div class="desc-full" id="d3a">
+      <p><strong>우미(海) 지옥</strong> — 코발트블루색의 거대한 온천 풀. 수온 약 98도. 가장 규모가 크고 인기 있는 지옥입니다.</p>
+      <p><strong>가마도(竈) 지옥</strong> — 6종류의 온천이 한 곳에 집약. 족욕·손욕·음용 온천수·증기 체험 등 체험 요소가 풍부합니다.</p>
+      <div class="info-list">
+        <div class="info-row"><span>입장료 (각 지옥)</span><span>성인 450엔</span></div>
+        <div class="info-row"><span>관람 소요 (2곳)</span><span>약 1시간 30분</span></div>
+      </div>
+      <div class="food-sec">
+        <div class="food-lbl">🍽️ 점심 후보</div>
+        <div class="chips">
+          <span class="chip main">⭐ 지고쿠무시코보 칸나와 (지옥찜)</span>
+          <span class="chip">아마미차야 (향토음식)</span>
+          <span class="chip">사누끼 수타 (우동)</span>
+        </div>
+      </div>
+    </div>
+    <button class="toggle-btn" onclick="tgl('d3a',this)"><span class="tgl-icon">▼</span> 더 보기</button>
+  </div>
+</div>
+
+<div class="scene-card">
+  <div class="scene-art art-safari">
+    <div class="scene-art-emoji">🦁</div>
+    <div style="position:relative;z-index:2">
+      <div class="scene-art-label">African Safari · Usa-shi, Oita</div>
+      <div class="scene-art-title">아프리칸 사파리</div>
+    </div>
+  </div>
+  <div class="scene-body">
+    <div class="time-row">
+      <span class="tr-move">🚗 국도 50분 이동</span>
+      <span class="tr-arr">13:20 도착</span>
+      <span class="tr-stay">⏱ 약 2시간 30분 체류</span>
+      <span class="tr-warn">⚠ 입장마감 16:00</span>
+    </div>
+    <div class="scene-head">렌터카로 직접 달리는 야생 정글 드라이브</div>
+    <div class="scene-tagline">아시아 최대급 · 70종 1,400마리 · 드라이브 스루 사파리</div>
+    <p class="desc-short">이중 철문을 통과하면 차창 바로 앞에 사자·기린·얼룩말이 등장합니다. 사파리 후반 체험 동물원에서 말 먹이 주기도 가능합니다.</p>
+    <div class="desc-full" id="d3b">
+      <p>사파리 내부는 구역별 이중 철조망으로 분리되어 안전합니다. 차에서 내리지 않고 관람하므로 컨디션이 좋지 않을 때도 여유 있게 즐길 수 있습니다.</p>
+      <div class="warn-box">💴 내부 식당·기념품샵 <strong>카드 결제 불가 — 현금 필수</strong><br>먹이 구매도 현금만 가능 (100엔~)</div>
+      <div class="info-list">
+        <div class="info-row"><span>입장료 성인 (고등학생 이상)</span><span>2,600엔</span></div>
+        <div class="info-row"><span>입장료 어린이 (4세~중학생)</span><span>1,500엔</span></div>
+        <div class="info-row"><span>입장 마감 (하절기)</span><span>16:00</span></div>
+        <div class="info-row"><span>13:20 입장 시 여유</span><span>약 2시간 30분</span></div>
+      </div>
+    </div>
+    <button class="toggle-btn" onclick="tgl('d3b',this)"><span class="tgl-icon">▼</span> 더 보기</button>
+  </div>
+</div>
+
+<div class="scene-card" style="margin-bottom:14px">
+  <div class="scene-body" style="padding:13px 16px">
+    <div class="time-row">
+      <span class="tr-move">🚗 국도 50분 이동</span>
+      <span class="tr-arr">16:40 도착</span>
+    </div>
+    <div class="scene-head">호텔 복귀 & 벳푸 둘째 날 저녁</div>
+    <div class="food-sec" style="border-top:none;padding-top:0;margin-top:4px">
+      <div class="food-lbl">🍽️ 저녁 후보 (전날 못 간 곳으로)</div>
+      <div class="chips">
+        <span class="chip main">⭐ 토요츠네 본점 (텐동)</span>
+        <span class="chip">스이텐 스시</span>
+        <span class="chip">야키니쿠 간소우</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="meal-row">
+  <div class="meal-cell"><div class="m-lbl">조식</div><div class="m-val inc">호텔식 ✓</div></div>
+  <div class="meal-cell"><div class="m-lbl">중식</div><div class="m-val">현지식</div></div>
+  <div class="meal-cell"><div class="m-lbl">석식</div><div class="m-val">현지식</div></div>
+  <div class="meal-cell"><div class="m-lbl">숙박</div><div class="m-val inc">렉스호텔<br>벳푸 ✓</div></div>
+</div>
+<div class="day-divider"></div>
+
+<!-- ─── DAY 4 ─── -->
+
+<div class="day-sec">
+  <div class="day-badge"><span class="day-num">DAY 4</span><span class="day-date">5월 18일 (월)</span></div>
+  <div class="day-title">감성 드라이브, 구마모토 입성</div>
+  <div class="day-sub">유후인 → 다이칸보 → 구마모토</div>
+</div>
+
+<div class="scene-card">
+  <div class="scene-art art-yufuin">
+    <div class="scene-art-bg" style="background-image:url('https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/Yufuin_Kinrinko_2009.jpg/800px-Yufuin_Kinrinko_2009.jpg')" onerror="this.style.display='none'"></div>
+    <div class="scene-art-overlay"></div>
+    <div class="scene-art-emoji">🏘️</div>
+    <div style="position:relative;z-index:2">
+      <div class="scene-art-label">Yufuin · Kinrinko Lake</div>
+      <div class="scene-art-title">유후인 산책 & 점심</div>
+    </div>
+  </div>
+  <div class="scene-body">
+    <div class="time-row">
+      <span class="tr-move">🚗 국도 40분 이동</span>
+      <span class="tr-arr">09:40 도착</span>
+      <span class="tr-stay">⏱ 약 2시간 50분 체류 (산책+점심)</span>
+    </div>
+    <div class="scene-head">물안개 피어오르는 고급 온천 마을</div>
+    <div class="scene-tagline">긴린코 호수 → 유노츠보 거리 · 수제 간식·잡화 상점 밀집</div>
+    <p class="desc-short">유후다케 화산 기슭의 온천 마을. 유노츠보 거리에는 수제 버터쿠키, 롤케이크, 잡화 숍이 줄지어 있습니다.</p>
+    <div class="desc-full" id="d4a">
+      <p>긴린코 호수는 호수 바닥에서 온천수가 솟아 수온이 높고 물고기들이 선명하게 보입니다. 이른 아침에는 수면 위로 물안개가 피어오르는 장면이 환상적입니다. 점심은 12:30~13:00 사이에 마무리하여 야마나미 하이웨이 드라이브 여유를 확보하세요.</p>
+      <div class="food-sec">
+        <div class="food-lbl">🍽️ 점심 후보</div>
+        <div class="chips">
+          <span class="chip main">⭐ 츠카하라노 사토</span>
+          <span class="chip">나스야</span>
+          <span class="chip">시치린스미비야키 케에슈우안 (닭요리)</span>
+        </div>
+      </div>
+    </div>
+    <button class="toggle-btn" onclick="tgl('d4a',this)"><span class="tgl-icon">▼</span> 더 보기</button>
+  </div>
+</div>
+
+<div class="scene-card">
+  <div class="scene-art art-daikan">
+    <div class="scene-art-bg" style="background-image:url('https://upload.wikimedia.org/wikipedia/commons/thumb/2/28/Daikanbo_Kumamoto01.jpg/800px-Daikanbo_Kumamoto01.jpg')" onerror="this.style.display='none'"></div>
+    <div class="scene-art-overlay"></div>
+    <div class="scene-art-emoji">🏔️</div>
+    <div style="position:relative;z-index:2">
+      <div class="scene-art-label">Daikanbo · Aso Caldera</div>
+      <div class="scene-art-title">다이칸보 전망대</div>
+    </div>
+  </div>
+  <div class="scene-body">
+    <div class="time-row">
+      <span class="tr-move">🚗 야마나미 하이웨이 70분 이동</span>
+      <span class="tr-arr">13:40 도착</span>
+      <span class="tr-stay">⏱ 약 40분 체류</span>
+    </div>
+    <div class="scene-head">아소 칼데라 전체를 360도로 내려다보는 외륜산 최고봉</div>
+    <div class="scene-tagline">해발 936m · 야마나미 하이웨이 종착 전망 포인트</div>
+    <p class="desc-short">유후인→다이칸보 야마나미 하이웨이는 규슈 최고의 드라이브 코스. 해발 1,000m 고원을 달리며 화산 지형을 감상합니다. 정상에서 칼데라 전체 조망.</p>
+    <div class="desc-full" id="d4b">
+      <p>'크게 바라본다(大観)'는 뜻으로, 아소 칼데라 전체와 나카다케 화구, 저 멀리까지 보이는 360도 파노라마가 펼쳐집니다. 전망대 주변에 매점과 화장실이 있어 편리합니다.</p>
+    </div>
+    <button class="toggle-btn" onclick="tgl('d4b',this)"><span class="tgl-icon">▼</span> 더 보기</button>
+  </div>
+</div>
+
+<div class="scene-card">
+  <div class="scene-art art-kumamoto" style="height:90px">
+    <div class="scene-art-emoji">🏯</div>
+    <div style="position:relative;z-index:2">
+      <div class="scene-art-label">REF Vessel Hotel Kumamoto</div>
+      <div class="scene-art-title">구마모토 시내 도착</div>
+    </div>
+  </div>
+  <div class="scene-body">
+    <div class="time-row">
+      <span class="tr-move">🚗 국도 57호 110분 이동</span>
+      <span class="tr-arr">17:10 도착</span>
+      <span class="tr-warn">⚠ 최장 드라이브 구간</span>
+    </div>
+    <div class="scene-head">베셀 호텔 체크인 · 시청 무료 전망대 야경</div>
+    <p class="desc-short">체크인 후 구마모토 시청 전망대(무료)에서 야경 감상 후 저녁 식사.</p>
+    <div class="desc-full" id="d4c">
+      <div class="food-sec" style="border-top:none;padding-top:0;margin-top:0">
+        <div class="food-lbl">🍽️ 저녁 후보</div>
+        <div class="chips">
+          <span class="chip main">⭐ 카츠레츠테이 (돈카츠)</span>
+          <span class="chip">라멘</span>
+          <span class="chip">스시</span>
+          <span class="chip">와규 타카</span>
+        </div>
+      </div>
+    </div>
+    <button class="toggle-btn" onclick="tgl('d4c',this)"><span class="tgl-icon">▼</span> 더 보기</button>
+  </div>
+</div>
+
+<div class="meal-row">
+  <div class="meal-cell"><div class="m-lbl">조식</div><div class="m-val inc">호텔식 ✓</div></div>
+  <div class="meal-cell"><div class="m-lbl">중식</div><div class="m-val">현지식</div></div>
+  <div class="meal-cell"><div class="m-lbl">석식</div><div class="m-val">현지식</div></div>
+  <div class="meal-cell"><div class="m-lbl">숙박</div><div class="m-val inc">베셀<br>구마모토 ✓</div></div>
+</div>
+<div class="day-divider"></div>
+
+<!-- ─── DAY 5 ─── -->
+
+<div class="day-sec">
+  <div class="day-badge"><span class="day-num">DAY 5</span><span class="day-date">5월 19일 (화)</span></div>
+  <div class="day-title">아쉬운 마무리, 귀국</div>
+  <div class="day-sub">스이젠지 조주엔 → 점심 → 구마모토 공항</div>
+</div>
+
+<div class="scene-card">
+  <div class="scene-art art-suizen">
+    <div class="scene-art-bg" style="background-image:url('https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/Suizenji_Jojuen_01.jpg/800px-Suizenji_Jojuen_01.jpg')" onerror="this.style.display='none'"></div>
+    <div class="scene-art-overlay"></div>
+    <div class="scene-art-emoji">🌿</div>
+    <div style="position:relative;z-index:2">
+      <div class="scene-art-label">Suizenji Jojuen · Kumamoto</div>
+      <div class="scene-art-title">스이젠지 조주엔 정원</div>
+    </div>
+  </div>
+  <div class="scene-body">
+    <div class="time-row">
+      <span class="tr-move">🚗 15분 이동</span>
+      <span class="tr-arr">09:45 도착</span>
+      <span class="tr-stay">⏱ 약 1시간 30분 체류</span>
+    </div>
+    <div class="scene-head">350년 역사 에도 시대 다이묘 정원</div>
+    <div class="scene-tagline">도카이도 53경 압축 재현 · 5월 붓꽃과 신록 절정</div>
+    <p class="desc-short">1636년 호소카와 번주가 조성한 회유식 정원. 평탄한 산책로를 따라 연못, 동산, 소나무들이 어우러진 풍경이 펼쳐집니다.</p>
+    <div class="desc-full" id="d5a">
+      <p>5월에는 연못 가장자리 붓꽃과 신록이 절정을 이루어 사진이 잘 나오는 시기입니다. 입장료 성인 400엔. 정원 옆 찻집에서 말차와 화과자도 즐길 수 있습니다.</p>
+    </div>
+    <button class="toggle-btn" onclick="tgl('d5a',this)"><span class="tgl-icon">▼</span> 더 보기</button>
+  </div>
+</div>
+
+<div class="scene-card" style="margin-bottom:14px">
+  <div class="scene-body" style="padding:13px 16px">
+    <div class="time-row">
+      <span class="tr-arr">11:15 출발</span>
+      <span class="tr-move">⛽ 주유 후 → 🚗 공항 40분 이동</span>
+    </div>
+    <div class="scene-head">점심 → 렌터카 반납 (12:00 예약) → 귀국 수속</div>
+    <p class="desc-short" style="font-size:12px;color:var(--ink-m);line-height:1.65">12:00 렌터카 반납 예약으로 공항까지 여유 있게 이동 가능. 반납 전 주유 후 영수증 보관 필수. 13:00 체크인 목표.</p>
+  </div>
+</div>
+
+<div class="flight-card">
+  <div class="fc-times">
+    <div><div class="fc-time">14:50</div><div class="fc-city">구마모토 KMJ</div></div>
+    <div><div class="fc-time">15:55</div><div class="fc-city">부산 PUS</div></div>
+  </div>
+  <div class="fc-line">
+    <div class="fc-dot arr"></div>
+    <div class="fc-stem"><div class="fc-plane">✈</div></div>
+    <div class="fc-dot"></div>
+  </div>
+  <div class="fc-info">
+    <div>
+      <div class="fc-from">구마모토 출발</div>
+      <div class="fc-airline"><span class="fc-badge">EASTAR</span><span class="fc-fnum">ZE968</span></div>
+      <div class="fc-dur">⏱ 1시간 5분</div>
+    </div>
+    <div class="fc-to">부산 도착 🏠</div>
+  </div>
+</div>
+
+<div class="meal-row">
+  <div class="meal-cell"><div class="m-lbl">조식</div><div class="m-val inc">호텔식 ✓</div></div>
+  <div class="meal-cell"><div class="m-lbl">중식</div><div class="m-val">시내</div></div>
+  <div class="meal-cell"><div class="m-lbl">석식</div><div class="m-val">귀가 후 🏠</div></div>
+  <div class="meal-cell"><div class="m-lbl">숙박</div><div class="m-val">우리집 😊</div></div>
+</div>
+
+<div style="height:36px"></div>
+</div><!-- /view-sched -->
+
+<!-- ══════════════════════════════════════════════
+     VIEW 2 — 예산
+══════════════════════════════════════════════ -->
+
+<div id="view-budget" class="tab-view budget-view">
+
+  <div class="budget-total">
+    <div class="bt-label">우리 가족 총 예상 경비</div>
+    <div class="bt-amount">약 490<span style="font-size:20px;font-weight:700">만원</span></div>
+    <div class="bt-sub">성인 4인 + 만 4세 1인 · 환율 100엔 = 930원 기준</div>
+    <div class="bt-badge">예산 500만원 대비 약 10만원 여유 확보</div>
+  </div>
+
+  <div class="chart-card">
+    <h3>예산 구성 비율</h3>
+    <div class="chart-wrap"><canvas id="budgetChart"></canvas></div>
+  </div>
+
+  <div class="bsec-title">01 · 한국 사전 결제 완료</div>
+  <div class="bcard">
+    <div class="bcard-head">
+      <div><div class="bh-lbl">PREPAID IN KOREA</div><div class="bh-title">항공 + 벳푸·구마모토 호텔</div></div>
+      <div class="bh-amt">2,516,000원</div>
+    </div>
+    <div class="bcard-body">
+      <div class="b-row"><span class="b-label">이스타항공 왕복 (5인)</span><span class="b-amt">1,206,000원</span></div>
+      <div class="b-row"><span class="b-label">렉스 호텔 벳푸 (2박/조식)</span><span class="b-amt">1,002,000원</span></div>
+      <div class="b-row"><span class="b-label">베셀 호텔 구마모토 (1박/조식)</span><span class="b-amt">308,000원</span></div>
+    </div>
+  </div>
+
+  <div class="bsec-title">02 · 현지 고정 지출 (확정)</div>
+  <div class="bcard">
+    <div class="bcard-head">
+      <div><div class="bh-lbl">LOCAL FIXED COST</div><div class="bh-title">아소 호텔 + 렌터카</div></div>
+      <div class="bh-amt">약 1,170,000원</div>
+    </div>
+    <div class="bcard-body">
+      <div class="b-row">
+        <span class="b-label">카메노이 아소 (1박/조식·석식)</span>
+        <div><div class="b-amt">약 599,000원</div><div class="b-sub">64,392엔</div></div>
+      </div>
+      <div class="b-row">
+        <span class="b-label">토요타 렌터카 (복시/노아)</span>
+        <div><div class="b-amt">약 571,000원</div><div class="b-sub">61,380엔</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bsec-title">03 · 관광지 입장료</div>
+  <div class="bcard">
+    <div class="bcard-head">
+      <div><div class="bh-lbl">ENTRY FEES</div><div class="bh-title">총 5개 관광지</div></div>
+      <div class="bh-amt">약 183,000원</div>
+    </div>
+    <div class="bcard-body">
+      <div class="b-note">총 실비: 약 19,700엔</div>
+      <div class="b-row"><span class="b-label">아프리칸 사파리 (성인4 + 아이1)</span><span class="b-amt">11,900엔</span></div>
+      <div class="b-row"><span class="b-label">지옥온천 2곳 × 성인4</span><span class="b-amt">3,600엔</span></div>
+      <div class="b-row"><span class="b-label">고코노에 현수교 (성인4 + 아이1)</span><span class="b-amt">2,200엔</span></div>
+      <div class="b-row"><span class="b-label">스이젠지 조주엔 (성인4)</span><span class="b-amt">1,600엔</span></div>
+      <div class="b-row"><span class="b-label">신아소대교 전망대 (무료)</span><span class="b-amt">—</span></div>
+      <div class="b-total-row"><span>합계</span><span>19,300엔</span></div>
+    </div>
+  </div>
+
+  <div class="bsec-title">04 · 식비 & 주유 & 기타</div>
+  <div class="bcard">
+    <div class="bcard-head">
+      <div><div class="bh-lbl">LIVING EXPENSES</div><div class="bh-title">식비 + 주유 + 잡비</div></div>
+      <div class="bh-amt">약 1,023,000원</div>
+    </div>
+    <div class="bcard-body">
+      <div class="b-note">넉넉하게 110,000엔 배정</div>
+      <div class="b-row"><span class="b-label">가족 식대 (중식·석식 × 4일)</span><span class="b-amt">70,000엔</span></div>
+      <div class="b-row"><span class="b-label">간식 · 커피 · 편의점</span><span class="b-amt">20,000엔</span></div>
+      <div class="b-row"><span class="b-label">주유비 (~650km)</span><span class="b-amt">9,000엔</span></div>
+      <div class="b-row"><span class="b-label">주차 · 기타 잡비</span><span class="b-amt">11,000엔</span></div>
+    </div>
+  </div>
+
+  <div class="final-card">
+    <div style="font-size:10px;font-weight:900;color:rgba(255,255,255,.35);letter-spacing:.12em;margin-bottom:10px">TOTAL SUMMARY</div>
+    <div class="row"><span>사전 결제 (확정)</span><span>2,516,000원</span></div>
+    <div class="row"><span>현지 고정비 (확정)</span><span>약 1,170,000원</span></div>
+    <div class="row"><span>관광지 입장료</span><span>약 183,000원</span></div>
+    <div class="row"><span>식비 · 주유 · 기타</span><span>약 1,023,000원</span></div>
+    <div class="total-row">
+      <span class="tot-lbl">총 합계</span>
+      <span class="tot-amt">약 4,892,000원</span>
+    </div>
+    <div class="tot-note">예산 500만원 대비 약 10만원 여유 ✓</div>
+  </div>
+
+  <div style="height:40px"></div>
+</div><!-- /view-budget -->
+
+</div><!-- /shell -->
+
 <script>
-    // Tab switching logic
-    function switchTab(tabId) {
-        // Hide all views
-        document.querySelectorAll('.tab-content').forEach(el => {
-            el.classList.remove('active');
-        });
-        
-        // Reset tab styles
-        document.getElementById('tab-itinerary').className = 'w-1/2 py-3.5 border-b-2 border-transparent transition-colors text-slate-400';
-        document.getElementById('tab-budget').className = 'w-1/2 py-3.5 border-b-2 border-transparent transition-colors text-slate-400';
-        
-        // Show active view & set active tab style
-        document.getElementById(`view-${tabId}`).classList.add('active');
-        document.getElementById(`tab-${tabId}`).className = 'w-1/2 py-3.5 text-brand border-b-2 border-brand transition-colors';
-        
-        // Scroll to top
-        window.scrollTo({ top: 350, behavior: 'smooth' });
-    }
+function switchTab(id, btn) {
+  document.querySelectorAll('.tab-view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('view-' + id).classList.add('active');
+  btn.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
 
-    // Chart.js 초기화
-    document.addEventListener("DOMContentLoaded", function() {
-        const ctx = document.getElementById('budgetChart').getContext('2d');
-        
-        // 금액 데이터 (원화 계산)
-        const flight = 1206000;
-        const accommodation = 1002000 + 308000 + 598845; // 벳푸 + 구마모토 + 아소
-        const food = (80000 + 20000) * 9.3; // 식비+간식
-        const transport = 570834 + ((8000 + 2000) * 9.3); // 렌터카 + 주유/주차
-        const entry = 181350;
+function tgl(id, btn) {
+  const el = document.getElementById(id);
+  const open = el.classList.toggle('open');
+  btn.classList.toggle('open', open);
+  btn.innerHTML = open
+    ? '<span class="tgl-icon">▲</span> 간략히 보기'
+    : '<span class="tgl-icon">▼</span> 더 보기';
+}
 
-        new Chart(ctx, {
-            type: 'doughnut',
-            data: {
-                labels: ['항공편', '숙박비', '가족식비', '렌터카/주유', '관광입장료'],
-                datasets: [{
-                    data: [flight, accommodation, food, transport, entry],
-                    backgroundColor: [
-                        '#3b82f6', // blue
-                        '#10b981', // emerald
-                        '#f59e0b', // amber
-                        '#8b5cf6', // violet
-                        '#ef4444'  // red
-                    ],
-                    borderWidth: 2,
-                    borderColor: '#ffffff',
-                    hoverOffset: 4
-                }]
-            },
-            options: {
-                responsive: true,
-                cutout: '65%',
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                        labels: {
-                            font: { family: "'Noto Sans KR', sans-serif", size: 12 },
-                            usePointStyle: true,
-                            padding: 20
-                        }
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                let label = context.label || '';
-                                if (label) { label += ': '; }
-                                if (context.parsed !== null) {
-                                    label += new Intl.NumberFormat('ko-KR').format(context.parsed) + '원';
-                                }
-                                return label;
-                            }
-                        }
-                    }
-                }
+document.addEventListener('DOMContentLoaded', () => {
+  const ctx = document.getElementById('budgetChart');
+  if (!ctx) return;
+  new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: ['항공편', '숙박비', '렌터카·주유', '식비·기타', '입장료'],
+      datasets: [{
+        data: [1206000, 1908000, 617000, 1023000, 183000],
+        backgroundColor: ['#3B82F6','#F59E0B','#10B981','#EF4444','#8B5CF6'],
+        borderWidth: 4, borderColor: '#fff', hoverOffset: 6
+      }]
+    },
+    options: {
+      responsive: true, cutout: '60%',
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: { font: { family: "'Noto Sans KR'", size: 11 }, usePointStyle: true, padding: 14, color: '#5A5A52' }
+        },
+        tooltip: {
+          callbacks: {
+            label: c => {
+              const t = c.dataset.data.reduce((a,b)=>a+b,0);
+              return ` ${c.label}: ${c.parsed.toLocaleString('ko-KR')}원 (${Math.round(c.parsed/t*100)}%)`;
             }
-        });
-    });
+          }
+        }
+      }
+    }
+  });
+});
 </script>
 
 </body>
