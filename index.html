@@ -41,10 +41,11 @@ margin: 0 auto;
 background: var(–cream);
 min-height: 100vh;
 box-shadow: 0 0 80px rgba(0,0,0,.15);
+overflow: hidden;
 }
 @media (min-width: 560px) {
 body { padding: 24px 0 40px; }
-.shell { border-radius: 18px; overflow: hidden; min-height: auto; }
+.shell { border-radius: 18px; min-height: auto; }
 }
 
 /* ── Hero ───────────────────────────────────── */
@@ -57,8 +58,8 @@ padding: 48px 28px 32px;
 content: ‘’;
 position: absolute; inset: 0;
 background:
-radial-gradient(ellipse 160% 80% at 110% 120%, #1a3d28 0%, transparent 60%),
-radial-gradient(ellipse 80% 60% at -10% -10%, #3d7a55 0%, transparent 50%);
+radial-gradient(ellipse 160% 80% at 110% 120%, #1a3d28 0%, rgba(26,61,40,0) 60%),
+radial-gradient(ellipse 80% 60% at -10% -10%, #3d7a55 0%, rgba(61,122,85,0) 50%);
 }
 .hero-rings {
 position: absolute; top: -50px; right: -50px;
